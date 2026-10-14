@@ -1,20 +1,20 @@
 protocol,model,seed,label,kind,n_train,n_test,correct_frac
 random,gbdt,0,BENIGN,benign,160947,120599,0.9992205573843896
 random,gbdt,0,Bot,attack,144,84,0.6666666666666666
-random,gbdt,0,DDoS,attack,8945,6777,0.9992622104175889
+random,gbdt,0,DDoS,attack,8945,6777,0.9992622104175888
 random,gbdt,0,DoS GoldenEye,attack,724,548,1.0
 random,gbdt,0,DoS Hulk,attack,16256,12143,0.9990117763320432
-random,gbdt,0,DoS Slowhttptest,attack,369,286,0.9895104895104895
+random,gbdt,0,DoS Slowhttptest,attack,369,286,0.9895104895104896
 random,gbdt,0,DoS slowloris,attack,407,310,1.0
 random,gbdt,0,FTP-Patator,attack,586,401,1.0
 random,gbdt,0,Infiltration,attack,2,2,0.0
-random,gbdt,0,PortScan,attack,11056,8413,0.9998811363366219
+random,gbdt,0,PortScan,attack,11056,8413,0.999881136336622
 random,gbdt,0,SSH-Patator,attack,414,326,1.0
 random,gbdt,0,Web Attack – Brute Force,attack,101,75,1.0
 random,gbdt,0,Web Attack – Sql Injection,attack,0,1,0.0
 random,gbdt,0,Web Attack – XSS,attack,47,35,1.0
-random,logreg,0,BENIGN,benign,160947,120599,0.9661191220491049
-random,logreg,0,Bot,attack,144,84,0.30952380952380953
+random,logreg,0,BENIGN,benign,160947,120599,0.9661191220491048
+random,logreg,0,Bot,attack,144,84,0.3095238095238095
 random,logreg,0,DDoS,attack,8945,6777,0.8500811568540653
 random,logreg,0,DoS GoldenEye,attack,724,548,0.7737226277372263
 random,logreg,0,DoS Hulk,attack,16256,12143,0.7368854484064893
@@ -23,28 +23,28 @@ random,logreg,0,DoS slowloris,attack,407,310,0.867741935483871
 random,logreg,0,FTP-Patator,attack,586,401,0.5187032418952618
 random,logreg,0,Infiltration,attack,2,2,0.5
 random,logreg,0,PortScan,attack,11056,8413,0.8901699750386307
-random,logreg,0,SSH-Patator,attack,414,326,0.006134969325153374
+random,logreg,0,SSH-Patator,attack,414,326,0.0061349693251533
 random,logreg,0,Web Attack – Brute Force,attack,101,75,0.0
 random,logreg,0,Web Attack – Sql Injection,attack,0,1,0.0
 random,logreg,0,Web Attack – XSS,attack,47,35,0.0
-temporal_per_class,gbdt,0,BENIGN,benign,160796,120599,0.9062595875587691
+temporal_per_class,gbdt,0,BENIGN,benign,160796,120599,0.9062595875587692
 temporal_per_class,gbdt,0,DDoS,attack,0,22503,0.6210283073367996
 temporal_per_class,gbdt,0,PortScan,attack,11982,6898,0.9998550304436068
 temporal_per_class,logreg,0,BENIGN,benign,160796,120599,0.8869476529656133
 temporal_per_class,logreg,0,DDoS,attack,0,22503,0.6360040883437764
 temporal_per_class,logreg,0,PortScan,attack,11982,6898,0.9637576109017106
-temporal_per_label,gbdt,0,BENIGN,benign,160832,120599,0.9077853050191129
-temporal_per_label,gbdt,0,Bot,attack,135,103,0.10679611650485436
-temporal_per_label,gbdt,0,DDoS,attack,8985,6751,0.9994074951858983
+temporal_per_label,gbdt,0,BENIGN,benign,160832,120599,0.9077853050191128
+temporal_per_label,gbdt,0,Bot,attack,135,103,0.1067961165048543
+temporal_per_label,gbdt,0,DDoS,attack,8985,6751,0.9994074951858984
 temporal_per_label,gbdt,0,DoS GoldenEye,attack,720,543,0.9723756906077348
-temporal_per_label,gbdt,0,DoS Hulk,attack,16251,12223,0.9914914505440563
-temporal_per_label,gbdt,0,DoS Slowhttptest,attack,386,281,0.9181494661921709
-temporal_per_label,gbdt,0,DoS slowloris,attack,397,306,0.9934640522875817
+temporal_per_label,gbdt,0,DoS Hulk,attack,16251,12223,0.9914914505440564
+temporal_per_label,gbdt,0,DoS Slowhttptest,attack,386,281,0.9181494661921707
+temporal_per_label,gbdt,0,DoS slowloris,attack,397,306,0.9934640522875816
 temporal_per_label,gbdt,0,FTP-Patator,attack,552,426,1.0
 temporal_per_label,gbdt,0,Heartbleed,attack,1,1,0.0
 temporal_per_label,gbdt,0,Infiltration,attack,4,2,0.5
 temporal_per_label,gbdt,0,PortScan,attack,11191,8335,0.9990401919616076
-temporal_per_label,gbdt,0,SSH-Patator,attack,398,316,0.9936708860759493
+temporal_per_label,gbdt,0,SSH-Patator,attack,398,316,0.9936708860759492
 temporal_per_label,gbdt,0,Web Attack – Brute Force,attack,96,77,1.0
 temporal_per_label,gbdt,0,Web Attack – Sql Injection,attack,1,1,1.0
 temporal_per_label,gbdt,0,Web Attack – XSS,attack,51,36,1.0
@@ -59,7 +59,7 @@ temporal_per_label,logreg,0,FTP-Patator,attack,552,426,0.5305164319248826
 temporal_per_label,logreg,0,Heartbleed,attack,1,1,1.0
 temporal_per_label,logreg,0,Infiltration,attack,4,2,0.0
 temporal_per_label,logreg,0,PortScan,attack,11191,8335,0.9604079184163168
-temporal_per_label,logreg,0,SSH-Patator,attack,398,316,0.012658227848101266
+temporal_per_label,logreg,0,SSH-Patator,attack,398,316,0.0126582278481012
 temporal_per_label,logreg,0,Web Attack – Brute Force,attack,96,77,0.0
 temporal_per_label,logreg,0,Web Attack – Sql Injection,attack,1,1,0.0
 temporal_per_label,logreg,0,Web Attack – XSS,attack,51,36,0.0
@@ -67,9 +67,9 @@ temporal_global,gbdt,0,BENIGN,benign,172966,99368,0.999345865872313
 temporal_global,gbdt,0,Bot,attack,0,344,0.0
 temporal_global,gbdt,0,DDoS,attack,0,22503,0.5786339599164556
 temporal_global,gbdt,0,Infiltration,attack,2,2,0.0
-temporal_global,gbdt,0,PortScan,attack,0,27783,0.003743296260303063
+temporal_global,gbdt,0,PortScan,attack,0,27783,0.003743296260303
 temporal_global,logreg,0,BENIGN,benign,172966,99368,0.9937303759761694
-temporal_global,logreg,0,Bot,attack,0,344,0.014534883720930232
+temporal_global,logreg,0,Bot,attack,0,344,0.0145348837209302
 temporal_global,logreg,0,DDoS,attack,0,22503,0.7043949695596142
 temporal_global,logreg,0,Infiltration,attack,2,2,0.0
-temporal_global,logreg,0,PortScan,attack,0,27783,0.0005039052658100278
+temporal_global,logreg,0,PortScan,attack,0,27783,0.00050390526581

@@ -1,0 +1,17 @@
+nohup: ignoring input
+[secleak] cicids2017_tl: dropping 288,602 completely empty rows
+[diagnose] random              rf     seed=0 F1=0.9958 prec=0.997 rec=0.995 (always-attack F1=0.328) 10s
+[diagnose] random              rf     seed=1 F1=0.9954 prec=0.996 rec=0.994 (always-attack F1=0.328) 11s
+[diagnose] temporal_per_class  rf     seed=0 F1=0.8298 prec=0.981 rec=0.719 (always-attack F1=0.328) 11s
+[diagnose] temporal_per_class  rf     seed=1 F1=0.8294 prec=0.981 rec=0.719 (always-attack F1=0.328) 11s
+[diagnose] temporal_global     rf     seed=0 F1=0.4392 prec=0.997 rec=0.282 (always-attack F1=0.505) 12s
+[diagnose] temporal_global     rf     seed=1 F1=0.4395 prec=0.998 rec=0.282 (always-attack F1=0.505) 12s
+[diagnose] gap=0.0   rf     seed=0 F1=0.8298
+[diagnose] gap=0.0   rf     seed=1 F1=0.8294
+[diagnose] gap=0.01  rf     seed=0 F1=0.8295
+[diagnose] gap=0.01  rf     seed=1 F1=0.8297
+[diagnose] gap=0.05  rf     seed=0 F1=0.8298
+[diagnose] gap=0.05  rf     seed=1 F1=0.8294
+[diagnose] gap=0.1   rf     seed=0 F1=0.8296
+[diagnose] gap=0.1   rf     seed=1 F1=0.8295
+diagnostics -> results/diagnose_cicids2017_tl/diagnostics.md

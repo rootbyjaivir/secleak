@@ -1,0 +1,18 @@
+nohup: ignoring input
+[secleak] cicids2017_tl: dropping 288,602 completely empty rows
+[cicids2017_tl] temporal_per_label  logreg  seed=0 F1=0.7231 (38.4s)
+[cicids2017_tl] temporal_per_label  rf      seed=0 F1=0.9794 (110.5s)
+[cicids2017_tl] temporal_per_label  gbdt    seed=0 F1=0.8372 (12.5s)
+[cicids2017_tl] temporal_per_label  logreg  seed=1 F1=0.7237 (36.0s)
+[cicids2017_tl] temporal_per_label  rf      seed=1 F1=0.9839 (106.4s)
+[cicids2017_tl] temporal_per_label  gbdt    seed=1 F1=0.8370 (13.1s)
+[cicids2017_tl] temporal_per_label  logreg  seed=2 F1=0.7243 (35.8s)
+[cicids2017_tl] temporal_per_label  rf      seed=2 F1=0.9845 (105.8s)
+[cicids2017_tl] temporal_per_label  gbdt    seed=2 F1=0.8370 (12.6s)
+[cicids2017_tl] temporal_per_label  logreg  seed=3 F1=0.7252 (34.5s)
+[cicids2017_tl] temporal_per_label  rf      seed=3 F1=0.9854 (109.7s)
+[cicids2017_tl] temporal_per_label  gbdt    seed=3 F1=0.8379 (12.7s)
+[cicids2017_tl] temporal_per_label  logreg  seed=4 F1=0.7232 (33.1s)
+[cicids2017_tl] temporal_per_label  rf      seed=4 F1=0.9849 (108.8s)
+[cicids2017_tl] temporal_per_label  gbdt    seed=4 F1=0.8375 (12.4s)
+saved results/cicids_per_label/results_cicids2017_tl.csv

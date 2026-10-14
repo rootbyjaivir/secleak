@@ -1,0 +1,45 @@
+diff -u a/src/secleak/diagnose.py b/src/secleak/diagnose.py
+--- a/src/secleak/diagnose.py	2026-10-14 03:12:38.996035668 +0000
++++ b/src/secleak/diagnose.py	2026-10-14 03:12:51.808686673 +0000
+@@ -103,9 +103,16 @@
+     for k, v in res.items():
+         v.to_csv(out / f"{k}.csv", index=False)
+     comp = res["composition"].groupby("protocol", as_index=False).mean(numeric_only=True).drop(columns=["seed"])
+-    pl = (res["per_label"].groupby(["protocol", "kind", "label"], as_index=False)
+-          .agg(n_train=("n_train", "mean"), n_test=("n_test", "mean"), correct_frac=("correct_frac", "mean")))
+-    pl = pl.pivot_table(index=["kind", "label"], columns="protocol", values="correct_frac").reset_index()
++    sections = []
++    for mname, g in res["per_label"].groupby("model"):      # NEVER pool models: their failure modes differ
++        t = g.groupby(["kind", "label", "protocol"], as_index=False).agg(
++            correct_frac=("correct_frac", "mean"), n_test=("n_test", "mean"))
++        piv = t.pivot_table(index=["kind", "label"], columns="protocol", values="correct_frac").reset_index()
++        ref = t[t.protocol.isin(["temporal_per_label", "random"])].groupby("label").n_test.max()
++        piv.insert(2, "n_test", piv["label"].map(ref))
++        piv["label"] = [f"{lab} (n<100)" if n < 100 else lab for lab, n in zip(piv["label"], piv["n_test"])]
++        sections += [f"### {mname}", "", _md(piv), ""]
++    pl_md = "\n".join(sections)
+     cnt = (res["label_counts"].query("seed == @res['label_counts'].seed.min()")
+            .pivot_table(index="label", columns=["protocol", "part"], values="n", aggfunc="sum").fillna(0))
+     gap = res["gap_sweep"].groupby(["gap_frac", "model"], as_index=False).agg(
+@@ -116,7 +123,9 @@
+              "split has learned nothing useful there.", "", _md(comp), "",
+              "## 2. Fraction of each label classified correctly",
+              "For attack labels this is recall; for BENIGN it is specificity (1 - false-alarm rate). "
+-             "Missing cell = label absent from that test set.", "", _md(pl), "",
++             "One table per model. `n_test` = test flows of that label (temporal_per_label / random split); "
++             "labels with n<100 are too small to interpret. Missing cell = label absent from that test set.",
++             "", pl_md,
+              "## 3. Gap sweep (temporal_per_class, gap between end of train and start of test)", "",
+              _md(gap), "",
+              "> Temporal splits are deterministic, so seeds only vary the model. These tables describe one "
+--- a/tests/test_diagnose.py	2026-10-14 03:12:38.997544302 +0000
++++ b/tests/test_diagnose.py	2026-10-14 03:12:51.808950817 +0000
+@@ -56,7 +56,7 @@
+     with tempfile.TemporaryDirectory() as tmp:
+         path = write_diagnostics(res, tmp, "syn_multi")
+         txt = path.read_text()
+-        for h in ("Split composition", "classified correctly", "Gap sweep", "always_attack_f1"):
++        for h in ("Split composition", "classified correctly", "Gap sweep", "always_attack_f1", "### rf", "n_test"):
+             assert h in txt
+ 
+ 

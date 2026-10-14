@@ -1,0 +1,175 @@
+diff -u a/src/secleak/cli.py b/src/secleak/cli.py
+--- a/src/secleak/cli.py	2026-10-14 02:58:11.494204127 +0000
++++ b/src/secleak/cli.py	2026-10-14 02:58:25.162235814 +0000
+@@ -46,7 +46,8 @@
+     ds = _load(args)
+     out = Path(args.out); out.mkdir(parents=True, exist_ok=True)
+     df = run_matrix(ds, protocols=args.protocols, models=args.models, seeds=range(args.seeds),
+-                    tune=not args.no_tune, max_train_rows=args.max_train_rows)
++                    tune=not args.no_tune, max_train_rows=args.max_train_rows,
++                    max_test_rows=args.max_test_rows or None, cap_mode=args.cap_mode)
+     path = out / f"results_{ds.name}.csv"
+     df.to_csv(path, index=False)
+     print("saved", path)
+@@ -56,7 +57,8 @@
+     from .diagnose import diagnose, write_diagnostics
+     ds = _load(args)
+     res = diagnose(ds, models=args.models, seeds=range(args.seeds), gaps=args.gaps,
+-                   max_train_rows=args.max_train_rows)
++                   max_train_rows=args.max_train_rows, max_test_rows=args.max_test_rows or None,
++                   cap_mode=args.cap_mode)
+     print("diagnostics ->", write_diagnostics(res, Path(args.out) / f"diagnose_{ds.name}", ds.name))
+ 
+ 
+@@ -120,12 +122,18 @@
+                                                     "temporal_per_label"])
+     s.add_argument("--models", nargs="+", default=["logreg", "rf", "gbdt", "mlp"])
+     s.add_argument("--seeds", type=int, default=5); s.add_argument("--no-tune", action="store_true")
+-    s.add_argument("--max-train-rows", type=int, default=200_000); s.set_defaults(fn=cmd_run)
++    s.add_argument("--max-train-rows", type=int, default=200_000)
++    s.add_argument("--max-test-rows", type=int, default=200_000, help="0 = evaluate on ALL test rows")
++    s.add_argument("--cap-mode", choices=["uniform", "label_floor"], default="uniform")
++    s.set_defaults(fn=cmd_run)
+ 
+     s = sub.add_parser("diagnose"); data_args(s)
+     s.add_argument("--models", nargs="+", default=["rf"]); s.add_argument("--seeds", type=int, default=2)
+     s.add_argument("--gaps", nargs="+", type=float, default=[0.0, 0.01, 0.05, 0.10])
+-    s.add_argument("--max-train-rows", type=int, default=200_000); s.set_defaults(fn=cmd_diagnose)
++    s.add_argument("--max-train-rows", type=int, default=200_000)
++    s.add_argument("--max-test-rows", type=int, default=200_000, help="0 = evaluate on ALL test rows")
++    s.add_argument("--cap-mode", choices=["uniform", "label_floor"], default="uniform")
++    s.set_defaults(fn=cmd_diagnose)
+ 
+     s = sub.add_parser("cross"); s.add_argument("a"); s.add_argument("b")
+     s.add_argument("--root", default="."); s.add_argument("--max-rows", type=int, default=200_000)
+diff -u a/src/secleak/diagnose.py b/src/secleak/diagnose.py
+--- a/src/secleak/diagnose.py	2026-10-14 02:58:11.495722599 +0000
++++ b/src/secleak/diagnose.py	2026-10-14 02:58:25.162862266 +0000
+@@ -19,7 +19,7 @@
+ import pandas as pd
+ 
+ from .data import Dataset
+-from .experiments import _cap
++from .experiments import _cap, cap_train
+ from .metrics import score
+ from .models import make_model
+ from .protocols import split
+@@ -34,7 +34,7 @@
+              models: Iterable[str] = ("rf",), seeds: Iterable[int] = (0, 1),
+              gaps: Iterable[float] = (0.0, 0.01, 0.05, 0.10), test_size: float = 0.3,
+              max_train_rows: int | None = 200_000, max_test_rows: int | None = 200_000,
+-             verbose: bool = True) -> dict[str, pd.DataFrame]:
++             cap_mode: str = "uniform", verbose: bool = True) -> dict[str, pd.DataFrame]:
+     X = ds.X
+     labels = ds.labels if ds.labels is not None else np.where(ds.y == 1, "ATTACK", "BENIGN")
+     comp, comp_lab, rec, gap_rows = [], [], [], []
+@@ -43,7 +43,7 @@
+         for seed in seeds:
+             tr, te = split(ds, protocol, test_size=test_size, seed=seed)
+             rng = np.random.default_rng(seed)
+-            tr, te = _cap(tr, max_train_rows, rng), _cap(te, max_test_rows, rng)
++            tr, te = cap_train(ds, tr, max_train_rows, rng, cap_mode), _cap(te, max_test_rows, rng)
+             p = float(ds.y[te].mean())
+             comp.append(dict(protocol=protocol, seed=seed, n_train=len(tr), n_test=len(te),
+                              train_attack_frac=float(ds.y[tr].mean()), test_attack_frac=p,
+@@ -72,7 +72,7 @@
+         for seed in seeds:
+             tr, te = split(ds, "temporal_per_class", test_size=test_size, seed=seed, gap_frac=gap)
+             rng = np.random.default_rng(seed)
+-            tr, te = _cap(tr, max_train_rows, rng), _cap(te, max_test_rows, rng)
++            tr, te = cap_train(ds, tr, max_train_rows, rng, cap_mode), _cap(te, max_test_rows, rng)
+             for mname in models:
+                 m = make_model(mname, seed, n_jobs=-1).fit(X.iloc[tr], ds.y[tr])
+                 sc = score(ds.y[te], m.predict(X.iloc[te]))
+diff -u a/src/secleak/experiments.py b/src/secleak/experiments.py
+--- a/src/secleak/experiments.py	2026-10-14 02:58:11.494122279 +0000
++++ b/src/secleak/experiments.py	2026-10-14 02:58:25.162199523 +0000
+@@ -22,6 +22,38 @@
+     return np.sort(rng.choice(idx, k, replace=False))
+ 
+ 
++def cap_label_floor(idx: np.ndarray, labels: np.ndarray, k: int | None, rng: np.random.Generator,
++                    floor: int = 5000) -> np.ndarray:
++    """Training cap that never starves rare labels.
++
++    Every row of a label with <= `floor` rows is kept; the remaining budget is filled by uniform sampling
++    from the larger labels. Without this, a uniform cap leaves e.g. Infiltration (36 flows) with ~0-3
++    training rows, so a "recall 0" says nothing about drift. NOTE: it shifts class priors towards rare
++    labels; apply it identically to every protocol and say so in the paper."""
++    if k is None or len(idx) <= k:
++        return idx
++    _, inv, cnt = np.unique(labels[idx], return_inverse=True, return_counts=True)
++    small = cnt <= floor
++    keep_small = np.flatnonzero(small[inv])
++    big = np.flatnonzero(~small[inv])
++    if len(keep_small) >= k:                      # degenerate: too many rare rows, fall back to uniform
++        return np.sort(rng.choice(idx, k, replace=False))
++    budget = k - len(keep_small)
++    chosen = big if budget >= len(big) else rng.choice(big, budget, replace=False)
++    return np.sort(idx[np.concatenate([keep_small, chosen])])
++
++
++def cap_train(ds: Dataset, idx: np.ndarray, k: int | None, rng: np.random.Generator,
++              mode: str = "uniform") -> np.ndarray:
++    if mode == "uniform":
++        return _cap(idx, k, rng)
++    if mode == "label_floor":
++        if ds.labels is None:
++            raise ValueError("cap_mode='label_floor' needs raw labels (Dataset.labels)")
++        return cap_label_floor(idx, ds.labels, k, rng)
++    raise ValueError(f"unknown cap_mode {mode!r}; choose 'uniform' or 'label_floor'")
++
++
+ def _tune(ds: Dataset, protocol: str, tr: np.ndarray, model_name: str, seed: int, X):
+     """Pick hyper-parameters on a validation split built with the SAME protocol."""
+     grid = GRIDS.get(model_name)
+@@ -47,7 +79,7 @@
+                models: Iterable[str] = MODEL_NAMES, seeds: Iterable[int] = (0, 1, 2),
+                test_size: float = 0.3, tune: bool = True,
+                max_train_rows: int | None = 200_000, max_test_rows: int | None = 200_000,
+-               verbose: bool = True) -> pd.DataFrame:
++               cap_mode: str = "uniform", verbose: bool = True) -> pd.DataFrame:
+     rows = []
+     X = ds.X
+     for protocol in protocols:
+@@ -56,7 +88,7 @@
+             ov_exact = train_test_overlap(X, tr, te, y=ds.y)
+             ov_near = train_test_overlap(X, tr, te, y=ds.y, near_sig=4)
+             rng = np.random.default_rng(seed)
+-            tr_c, te_c = _cap(tr, max_train_rows, rng), _cap(te, max_test_rows, rng)
++            tr_c, te_c = cap_train(ds, tr, max_train_rows, rng, cap_mode), _cap(te, max_test_rows, rng)
+             for mname in models:
+                 t0 = time.time()
+                 params = _tune(ds, protocol, tr_c, mname, seed, X) if tune else {}
+--- a/tests/test_diagnose.py	2026-10-14 02:58:11.497579521 +0000
++++ b/tests/test_diagnose.py	2026-10-14 02:58:25.163203817 +0000
+@@ -79,3 +79,15 @@
+     ds = _multilabel_ds(500); ds.labels = None
+     with pytest.raises(ValueError):
+         split(ds, "temporal_per_label")
++
++
++def test_cap_label_floor_keeps_rare_labels_and_respects_budget():
++    from secleak.experiments import cap_label_floor
++    rng = np.random.default_rng(0)
++    labels = np.array(["BENIGN"] * 9000 + ["DoS"] * 6000 + ["Rare"] * 30)
++    idx = np.arange(len(labels))
++    out = cap_label_floor(idx, labels, 8000, rng, floor=5000)
++    assert len(out) == 8000 and len(np.unique(out)) == 8000 and (np.diff(out) > 0).all()
++    assert (labels[out] == "Rare").sum() == 30                      # all rare rows kept
++    assert (labels[out] == "BENIGN").sum() > 0 and (labels[out] == "DoS").sum() >= 0
++    assert cap_label_floor(idx, labels, None, rng) is idx           # no cap -> unchanged
+--- a/docs/PREREGISTRATION.md	2026-10-14 02:58:11.496461270 +0000
++++ b/docs/PREREGISTRATION.md	2026-10-14 02:58:25.162994381 +0000
+@@ -49,3 +49,11 @@
+ the arrival of attack types seen little or never in training. `temporal_per_label` cuts within each raw label
+ to separate the two. H1 and all other pre-registered analyses are still reported exactly as registered
+ (with `temporal_per_class`); `temporal_per_label` is reported as exploratory/post-hoc, alongside them.
++
++**2026-10-14 - added `--cap-mode label_floor` and `--max-test-rows` (analysis options, default behaviour unchanged).**
++Reason: with the default uniform caps (500k-row subsample, 200k training rows) rare labels have 1-2 test flows
++(Infiltration, SQL Injection, Heartbleed) and almost no training flows, so their per-label recall is
++uninformative. `label_floor` keeps every row of labels with <= 5000 rows in the training set (this shifts class
++priors toward rare labels; it is applied identically to all protocols) and `--max-test-rows 0` scores all test
++rows. Used ONLY for label-level diagnostics; headline protocol comparisons keep the uniform cap. Any result
++produced with these options must say so.

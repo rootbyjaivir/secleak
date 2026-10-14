@@ -1,0 +1,7 @@
+data/
+results/
+*.pkl
+*.parquet
+__pycache__/
+.venv/
+*.egg-info/

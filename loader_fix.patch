@@ -1,0 +1,105 @@
+diff -u a/src/secleak/data.py b/src/secleak/data.py
+--- a/src/secleak/data.py	2026-10-13 18:49:59.395899344 +0000
++++ b/src/secleak/data.py	2026-10-13 18:50:14.346333451 +0000
+@@ -3,6 +3,7 @@
+ 
+ import glob
+ import os
++import sys
+ from dataclasses import dataclass, field
+ from pathlib import Path
+ 
+@@ -35,15 +36,18 @@
+     if kind == "epoch_s":
+         return pd.to_numeric(series, errors="coerce").to_numpy(dtype=float)
+     if kind == "cicids_dmy":
+-        ts = pd.to_datetime(series, format="%d/%m/%Y %H:%M", errors="coerce")
+-        if ts.isna().mean() > 0.5:           # some copies use seconds
+-            ts = pd.to_datetime(series, dayfirst=True, errors="coerce")
++        # Formats differ PER FILE (e.g. Monday has seconds, others do not), so parse per element:
++        # try with seconds first, then fall back to minutes only for the rows that failed.
++        ts = pd.to_datetime(series, format="%d/%m/%Y %H:%M:%S", errors="coerce")
++        miss = ts.isna()
++        if miss.any():
++            ts[miss] = pd.to_datetime(series[miss], format="%d/%m/%Y %H:%M", errors="coerce")
+         # HEURISTIC: the export has no AM/PM; captures ran ~09:00-17:00, so hours < 8
+         # are afternoon. Verify against the pcaps before relying on within-day order.
+         fix = ts.dt.hour < 8
+         ts = ts.where(~fix, ts + pd.Timedelta(hours=12))
+-        return (ts.astype("int64") / 1e9).to_numpy(dtype=float) if ts.notna().all() else \
+-            ts.map(lambda v: v.timestamp() if pd.notna(v) else np.nan).to_numpy(dtype=float)
++        # unit-safe conversion (pandas >= 3 may infer s/us/ns resolution; NaT -> NaN)
++        return ((ts - pd.Timestamp("1970-01-01")) / pd.Timedelta(seconds=1)).to_numpy(dtype=float)
+     if kind == "iso":
+         ts = pd.to_datetime(series, errors="coerce")
+         return ts.map(lambda v: v.timestamp() if pd.notna(v) else np.nan).to_numpy(dtype=float)
+@@ -81,6 +85,13 @@
+     """Turn a raw frame + preset into a Dataset (also used for synthetic data)."""
+     df = df.copy()
+     label_col = cfg["label_col"]
++    # Some raw files (e.g. CICIDS2017 Thursday-Morning-WebAttacks) end with thousands of fully empty rows.
++    internal = [c for c in df.columns if str(c).startswith("__")]
++    blank = df.drop(columns=internal).isna().all(axis=1).to_numpy()
++    n_blank = int(blank.sum())
++    if n_blank:
++        print(f"[secleak] {name}: dropping {n_blank:,} completely empty rows", file=sys.stderr)
++        df = df.loc[~blank].reset_index(drop=True)
+     lab = df[label_col]
+     if "benign_values" in cfg:
+         y = (~lab.astype(str).str.strip().isin(cfg["benign_values"])).astype(int).to_numpy()
+@@ -94,7 +105,13 @@
+     else:
+         t = _parse_time(df[cfg["time_col"]], kind)
+         proxy = False
+-    if np.isnan(t).any():
++    n_bad_time = int(np.isnan(t).sum())
++    if n_bad_time:
++        frac = n_bad_time / len(df)
++        msg = f"[secleak] {name}: {n_bad_time:,} of {len(df):,} rows ({frac:.2%}) have an unparseable timestamp"
++        if frac > 0.001:   # never drop a meaningful share of the data silently
++            raise ValueError(msg + " -- fix the time format in configs/datasets.yaml / _parse_time")
++        print(msg + "; dropping them", file=sys.stderr)
+         keep = ~np.isnan(t)
+         df, y, t = df.loc[keep].reset_index(drop=True), y[keep], t[keep]
+ 
+@@ -103,7 +120,8 @@
+     X = X.replace([np.inf, -np.inf], np.nan)
+     # constant string columns / free text are useless; keep it simple & deterministic
+     return Dataset(name=name, X=X.reset_index(drop=True), y=y, time=t, time_is_proxy=proxy,
+-                   meta={"n_raw": len(df), "time_kind": kind})
++                   meta={"n_raw": len(df), "n_blank_dropped": n_blank, "n_bad_time_dropped": n_bad_time,
++                         "time_kind": kind})
+ 
+ 
+ def harmonise(ds: Dataset, mapping: dict) -> pd.DataFrame:
+--- a/tests/test_loader.py	2026-10-13 18:49:59.396406316 +0000
++++ b/tests/test_loader.py	2026-10-13 18:50:14.347228838 +0000
+@@ -62,3 +62,28 @@
+             .to_csv(d2 / "a.csv", index=False)
+         ds2 = load_dataset("cicids2017_ml", root=root)
+         assert ds2.time_is_proxy and np.all(np.diff(ds2.time) > 0)
++
++
++def test_mixed_timestamp_formats_and_blank_rows_are_not_silently_lost():
++    """Regression: Monday file has seconds, others don't; Thursday-Morning ends with blank rows."""
++    import pytest
++    with tempfile.TemporaryDirectory() as tmp:
++        root = Path(tmp); _write_cic(root, n=300)
++        d = root / "data/raw/CICIDS2017/TrafficLabelling"
++        # file with seconds-format timestamps (like Monday-WorkingHours)
++        sec = pd.read_csv(d / "Tuesday.csv", encoding="cp1252")
++        sec[" Timestamp"] = "03/07/2017 09:15:58"
++        sec.to_csv(d / "Monday.csv", index=False, encoding="cp1252")
++        # file with trailing fully-empty rows
++        blank = sec.copy()
++        blank[" Timestamp"] = "6/7/2017 9:15"
++        pad = pd.DataFrame(np.nan, index=range(50), columns=blank.columns)
++        pd.concat([blank, pad]).to_csv(d / "Thursday.csv", index=False, encoding="cp1252")
++        ds = load_dataset("cicids2017_tl", root=root)
++        assert len(ds) == 900                       # nothing lost: 300 + 300 + 300 (50 blanks dropped)
++        assert ds.meta["n_blank_dropped"] == 50 and ds.meta["n_bad_time_dropped"] == 0
++        # genuinely bad timestamps in >0.1% of rows must raise, never drop silently
++        bad = pd.read_csv(d / "Tuesday.csv", encoding="cp1252"); bad[" Timestamp"] = "garbage"
++        bad.to_csv(d / "Tuesday.csv", index=False, encoding="cp1252")
++        with pytest.raises(ValueError):
++            load_dataset("cicids2017_tl", root=root)

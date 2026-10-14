@@ -1,0 +1,12 @@
+--- README.md	2026-10-14 02:29:02.929919856 +0000
++++ README.md	2026-10-14 02:31:01.133910561 +0000
+@@ -69,7 +69,8 @@
+ | `random` | stratified random 70% | 30% | nothing (the literature default) |
+ | `random_dedup` | after dropping duplicates + label-conflict groups | | duplicate leakage |
+ | `temporal_global` | earliest 70% of timeline | latest 30% | time leakage (changes class mix) |
+-| `temporal_per_class` | earliest 70% *within each class* | latest 30% | time leakage, keeps class balance |
++| `temporal_per_class` | earliest 70% *within benign and within attack* (binary class, all attack types pooled) | latest 30% | time leakage, keeps class balance; on CICIDS2017 the test attacks are only the latest campaigns |
++| `temporal_per_label` | earliest 70% *within each raw label* (BENIGN, DoS Hulk, ...) | latest 30% | drift within an attack type; every label is in both train and test |
+ | `cross_dataset` | all of A | all of B (harmonised features) | dataset-specific artefacts |
+ 
+ ## Caveats you must state in the paper

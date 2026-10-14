@@ -1,0 +1,50 @@
+# Dataset presets. Paths are globs relative to the repo root (put files in data/raw/).
+# Verify column names against your downloaded copy; vendors change file layouts.
+cicids2017_tl:            # "TrafficLabelling" / GeneratedLabelledFlows CSVs (has Timestamp)
+  glob: data/raw/CICIDS2017/TrafficLabelling/*.csv
+  encoding: cp1252
+  label_col: Label
+  benign_values: [BENIGN]
+  time_col: Timestamp
+  time_kind: cicids_dmy     # dd/mm/yyyy h:mm, no AM/PM -> heuristic fix
+  drop_cols: [Flow ID, Source IP, Destination IP, Source Port, Timestamp]
+cicids2017_ml:            # "MachineLearningCVE" CSVs (NO timestamps; row order only)
+  glob: data/raw/CICIDS2017/MachineLearningCVE/*.csv
+  encoding: cp1252
+  label_col: Label
+  benign_values: [BENIGN]
+  time_kind: file_order     # proxy time = (file order, row order); flagged in reports
+  drop_cols: []
+unsw_nb15_raw:            # UNSW-NB15_1..4.csv (headerless, 49 columns)
+  glob: data/raw/UNSW-NB15/UNSW-NB15_[1-4].csv
+  header: none
+  names: [srcip, sport, dstip, dsport, proto, state, dur, sbytes, dbytes, sttl, dttl,
+          sloss, dloss, service, Sload, Dload, Spkts, Dpkts, swin, dwin, stcpb, dtcpb,
+          smeans, dmeans, trans_depth, res_bdy_len, Sjit, Djit, Stime, Ltime, Sintpkt,
+          Dintpkt, tcprtt, synack, ackdat, is_sm_ips_ports, ct_state_ttl, ct_flw_http_mthd,
+          is_ftp_login, ct_ftp_cmd, ct_srv_src, ct_srv_dst, ct_dst_ltm, ct_src_ltm,
+          ct_src_dport_ltm, ct_dst_sport_ltm, ct_dst_src_ltm, attack_cat, Label]
+  label_col: Label
+  attack_value: 1
+  time_col: Stime
+  time_kind: epoch_s
+  drop_cols: [srcip, dstip, sport, Stime, Ltime, attack_cat]
+bot_iot:                  # BoT-IoT CSVs (full or 5%)
+  glob: data/raw/BoT-IoT/*.csv
+  label_col: attack
+  attack_value: 1
+  time_col: stime
+  time_kind: epoch_s
+  drop_cols: [pkSeqID, saddr, daddr, sport, stime, ltime, category, subcategory]
+# Harmonised columns for cross-dataset evaluation (name -> (column, scale to base unit)).
+harmonise:
+  cicids2017_tl: {duration_s: [Flow Duration, 1.0e-6], spkts: [Total Fwd Packets, 1],
+                  dpkts: [Total Backward Packets, 1], sbytes: [Total Length of Fwd Packets, 1],
+                  dbytes: [Total Length of Bwd Packets, 1]}
+  cicids2017_ml: {duration_s: [Flow Duration, 1.0e-6], spkts: [Total Fwd Packets, 1],
+                  dpkts: [Total Backward Packets, 1], sbytes: [Total Length of Fwd Packets, 1],
+                  dbytes: [Total Length of Bwd Packets, 1]}
+  unsw_nb15_raw: {duration_s: [dur, 1], spkts: [Spkts, 1], dpkts: [Dpkts, 1],
+                  sbytes: [sbytes, 1], dbytes: [dbytes, 1]}
+  bot_iot: {duration_s: [dur, 1], spkts: [spkts, 1], dpkts: [dpkts, 1],
+            sbytes: [sbytes, 1], dbytes: [dbytes, 1]}

@@ -1,0 +1,403 @@
+nohup: ignoring input
+[secleak] cicids2017_tl: dropping 288,602 completely empty rows
+[cicids2017_tl] random              logreg  seed=0 F1=0.8227 (41.6s)
+[cicids2017_tl] random              rf      seed=0 F1=0.9962 (113.2s)
+[cicids2017_tl] random              gbdt    seed=0 F1=0.9975 (13.5s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] random              mlp     seed=0 F1=0.9827 (279.0s)
+[cicids2017_tl] random              logreg  seed=1 F1=0.8421 (47.0s)
+[cicids2017_tl] random              rf      seed=1 F1=0.9958 (120.5s)
+[cicids2017_tl] random              gbdt    seed=1 F1=0.9972 (12.3s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] random              mlp     seed=1 F1=0.9800 (284.4s)
+[cicids2017_tl] random              logreg  seed=2 F1=0.8497 (39.6s)
+[cicids2017_tl] random              rf      seed=2 F1=0.9954 (110.2s)
+[cicids2017_tl] random              gbdt    seed=2 F1=0.9959 (11.8s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] random              mlp     seed=2 F1=0.9809 (324.4s)
+[cicids2017_tl] random              logreg  seed=3 F1=0.8510 (76.2s)
+[cicids2017_tl] random              rf      seed=3 F1=0.9956 (117.9s)
+[cicids2017_tl] random              gbdt    seed=3 F1=0.9973 (11.7s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] random              mlp     seed=3 F1=0.9778 (296.2s)
+[cicids2017_tl] random              logreg  seed=4 F1=0.8529 (42.1s)
+[cicids2017_tl] random              rf      seed=4 F1=0.9956 (127.6s)
+[cicids2017_tl] random              gbdt    seed=4 F1=0.9970 (10.8s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] random              mlp     seed=4 F1=0.9775 (329.9s)
+[cicids2017_tl] random              logreg  seed=5 F1=0.8562 (42.7s)
+[cicids2017_tl] random              rf      seed=5 F1=0.9961 (129.8s)
+[cicids2017_tl] random              gbdt    seed=5 F1=0.9977 (11.7s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] random              mlp     seed=5 F1=0.9828 (323.0s)
+[cicids2017_tl] random              logreg  seed=6 F1=0.8421 (48.1s)
+[cicids2017_tl] random              rf      seed=6 F1=0.9962 (134.0s)
+[cicids2017_tl] random              gbdt    seed=6 F1=0.9970 (11.6s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] random              mlp     seed=6 F1=0.9745 (335.0s)
+[cicids2017_tl] random              logreg  seed=7 F1=0.8527 (55.9s)
+[cicids2017_tl] random              rf      seed=7 F1=0.9963 (132.1s)
+[cicids2017_tl] random              gbdt    seed=7 F1=0.9973 (16.1s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] random              mlp     seed=7 F1=0.9772 (390.0s)
+[cicids2017_tl] random              logreg  seed=8 F1=0.8405 (49.1s)
+[cicids2017_tl] random              rf      seed=8 F1=0.9957 (129.7s)
+[cicids2017_tl] random              gbdt    seed=8 F1=0.9970 (15.6s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] random              mlp     seed=8 F1=0.9809 (382.3s)
+[cicids2017_tl] random              logreg  seed=9 F1=0.8404 (52.7s)
+[cicids2017_tl] random              rf      seed=9 F1=0.9956 (130.2s)
+[cicids2017_tl] random              gbdt    seed=9 F1=0.9977 (15.6s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] random              mlp     seed=9 F1=0.9758 (397.0s)
+[cicids2017_tl] random_dedup        logreg  seed=0 F1=0.8777 (48.6s)
+[cicids2017_tl] random_dedup        rf      seed=0 F1=0.9953 (134.1s)
+[cicids2017_tl] random_dedup        gbdt    seed=0 F1=0.9965 (15.6s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] random_dedup        mlp     seed=0 F1=0.9840 (384.7s)
+[cicids2017_tl] random_dedup        logreg  seed=1 F1=0.8759 (50.0s)
+[cicids2017_tl] random_dedup        rf      seed=1 F1=0.9950 (136.0s)
+[cicids2017_tl] random_dedup        gbdt    seed=1 F1=0.9966 (16.6s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] random_dedup        mlp     seed=1 F1=0.9533 (398.8s)
+[cicids2017_tl] random_dedup        logreg  seed=2 F1=0.8742 (43.3s)
+[cicids2017_tl] random_dedup        rf      seed=2 F1=0.9949 (134.3s)
+[cicids2017_tl] random_dedup        gbdt    seed=2 F1=0.9971 (17.0s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] random_dedup        mlp     seed=2 F1=0.9828 (378.3s)
+[cicids2017_tl] random_dedup        logreg  seed=3 F1=0.8735 (52.7s)
+[cicids2017_tl] random_dedup        rf      seed=3 F1=0.9951 (135.6s)
+[cicids2017_tl] random_dedup        gbdt    seed=3 F1=0.9949 (14.7s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] random_dedup        mlp     seed=3 F1=0.9857 (434.5s)
+[cicids2017_tl] random_dedup        logreg  seed=4 F1=0.8778 (46.8s)
+[cicids2017_tl] random_dedup        rf      seed=4 F1=0.9953 (134.5s)
+[cicids2017_tl] random_dedup        gbdt    seed=4 F1=0.9977 (14.9s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] random_dedup        mlp     seed=4 F1=0.9845 (371.3s)
+[cicids2017_tl] random_dedup        logreg  seed=5 F1=0.8764 (55.0s)
+[cicids2017_tl] random_dedup        rf      seed=5 F1=0.9947 (132.0s)
+[cicids2017_tl] random_dedup        gbdt    seed=5 F1=0.9970 (14.8s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] random_dedup        mlp     seed=5 F1=0.9830 (401.1s)
+[cicids2017_tl] random_dedup        logreg  seed=6 F1=0.8814 (46.2s)
+[cicids2017_tl] random_dedup        rf      seed=6 F1=0.9950 (132.0s)
+[cicids2017_tl] random_dedup        gbdt    seed=6 F1=0.9972 (16.8s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] random_dedup        mlp     seed=6 F1=0.9826 (405.3s)
+[cicids2017_tl] random_dedup        logreg  seed=7 F1=0.8745 (46.0s)
+[cicids2017_tl] random_dedup        rf      seed=7 F1=0.9948 (130.3s)
+[cicids2017_tl] random_dedup        gbdt    seed=7 F1=0.9975 (15.6s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] random_dedup        mlp     seed=7 F1=0.9804 (383.5s)
+[cicids2017_tl] random_dedup        logreg  seed=8 F1=0.8712 (44.2s)
+[cicids2017_tl] random_dedup        rf      seed=8 F1=0.9949 (132.3s)
+[cicids2017_tl] random_dedup        gbdt    seed=8 F1=0.9970 (14.8s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] random_dedup        mlp     seed=8 F1=0.9864 (369.9s)
+[cicids2017_tl] random_dedup        logreg  seed=9 F1=0.8707 (45.8s)
+[cicids2017_tl] random_dedup        rf      seed=9 F1=0.9951 (134.1s)
+[cicids2017_tl] random_dedup        gbdt    seed=9 F1=0.9967 (15.4s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] random_dedup        mlp     seed=9 F1=0.9847 (399.6s)
+[cicids2017_tl] temporal_global     logreg  seed=0 F1=0.4362 (32.0s)
+[cicids2017_tl] temporal_global     rf      seed=0 F1=0.4392 (128.7s)
+[cicids2017_tl] temporal_global     gbdt    seed=0 F1=0.3985 (13.0s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] temporal_global     mlp     seed=0 F1=0.4097 (404.4s)
+[cicids2017_tl] temporal_global     logreg  seed=1 F1=0.4357 (32.8s)
+[cicids2017_tl] temporal_global     rf      seed=1 F1=0.4365 (116.6s)
+[cicids2017_tl] temporal_global     gbdt    seed=1 F1=0.4476 (13.7s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] temporal_global     mlp     seed=1 F1=0.3976 (422.4s)
+[cicids2017_tl] temporal_global     logreg  seed=2 F1=0.4599 (43.0s)
+[cicids2017_tl] temporal_global     rf      seed=2 F1=0.4378 (130.0s)
+[cicids2017_tl] temporal_global     gbdt    seed=2 F1=0.4399 (15.3s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] temporal_global     mlp     seed=2 F1=0.3412 (417.9s)
+[cicids2017_tl] temporal_global     logreg  seed=3 F1=0.5438 (51.3s)
+[cicids2017_tl] temporal_global     rf      seed=3 F1=0.4367 (115.0s)
+[cicids2017_tl] temporal_global     gbdt    seed=3 F1=0.1396 (14.3s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] temporal_global     mlp     seed=3 F1=0.4366 (444.8s)
+[cicids2017_tl] temporal_global     logreg  seed=4 F1=0.5309 (54.6s)
+[cicids2017_tl] temporal_global     rf      seed=4 F1=0.4394 (129.2s)
+[cicids2017_tl] temporal_global     gbdt    seed=4 F1=0.1313 (14.2s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] temporal_global     mlp     seed=4 F1=0.4323 (462.8s)
+[cicids2017_tl] temporal_global     logreg  seed=5 F1=0.4355 (37.2s)
+[cicids2017_tl] temporal_global     rf      seed=5 F1=0.4393 (129.2s)
+[cicids2017_tl] temporal_global     gbdt    seed=5 F1=0.4396 (13.9s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] temporal_global     mlp     seed=5 F1=0.3941 (482.2s)
+[cicids2017_tl] temporal_global     logreg  seed=6 F1=0.4357 (38.5s)
+[cicids2017_tl] temporal_global     rf      seed=6 F1=0.4389 (130.0s)
+[cicids2017_tl] temporal_global     gbdt    seed=6 F1=0.0737 (14.9s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] temporal_global     mlp     seed=6 F1=0.4325 (424.8s)
+[cicids2017_tl] temporal_global     logreg  seed=7 F1=0.4359 (36.3s)
+[cicids2017_tl] temporal_global     rf      seed=7 F1=0.4386 (127.2s)
+[cicids2017_tl] temporal_global     gbdt    seed=7 F1=0.2593 (14.9s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] temporal_global     mlp     seed=7 F1=0.4269 (411.3s)
+[cicids2017_tl] temporal_global     logreg  seed=8 F1=0.4362 (38.4s)
+[cicids2017_tl] temporal_global     rf      seed=8 F1=0.4365 (117.4s)
+[cicids2017_tl] temporal_global     gbdt    seed=8 F1=0.4368 (14.0s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] temporal_global     mlp     seed=8 F1=0.4359 (500.5s)
+[cicids2017_tl] temporal_global     logreg  seed=9 F1=0.4368 (33.1s)
+[cicids2017_tl] temporal_global     rf      seed=9 F1=0.4371 (116.6s)
+[cicids2017_tl] temporal_global     gbdt    seed=9 F1=0.4414 (15.6s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] temporal_global     mlp     seed=9 F1=0.4042 (512.3s)
+[cicids2017_tl] temporal_per_class  logreg  seed=0 F1=0.6551 (44.4s)
+[cicids2017_tl] temporal_per_class  rf      seed=0 F1=0.8298 (127.1s)
+[cicids2017_tl] temporal_per_class  gbdt    seed=0 F1=0.6808 (14.1s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] temporal_per_class  mlp     seed=0 F1=0.7110 (477.7s)
+[cicids2017_tl] temporal_per_class  logreg  seed=1 F1=0.6564 (41.4s)
+[cicids2017_tl] temporal_per_class  rf      seed=1 F1=0.8289 (127.2s)
+[cicids2017_tl] temporal_per_class  gbdt    seed=1 F1=0.3666 (13.6s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] temporal_per_class  mlp     seed=1 F1=0.7120 (428.8s)
+[cicids2017_tl] temporal_per_class  logreg  seed=2 F1=0.6559 (42.0s)
+[cicids2017_tl] temporal_per_class  rf      seed=2 F1=0.8299 (125.7s)
+[cicids2017_tl] temporal_per_class  gbdt    seed=2 F1=0.6827 (15.8s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] temporal_per_class  mlp     seed=2 F1=0.6896 (442.3s)
+[cicids2017_tl] temporal_per_class  logreg  seed=3 F1=0.6591 (41.5s)
+[cicids2017_tl] temporal_per_class  rf      seed=3 F1=0.8298 (131.7s)
+[cicids2017_tl] temporal_per_class  gbdt    seed=3 F1=0.6805 (12.5s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] temporal_per_class  mlp     seed=3 F1=0.7220 (349.4s)
+[cicids2017_tl] temporal_per_class  logreg  seed=4 F1=0.6557 (32.0s)
+[cicids2017_tl] temporal_per_class  rf      seed=4 F1=0.8299 (126.6s)
+[cicids2017_tl] temporal_per_class  gbdt    seed=4 F1=0.6838 (13.3s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] temporal_per_class  mlp     seed=4 F1=0.7078 (315.4s)
+[cicids2017_tl] temporal_per_class  logreg  seed=5 F1=0.6555 (36.6s)
+[cicids2017_tl] temporal_per_class  rf      seed=5 F1=0.8299 (107.7s)
+[cicids2017_tl] temporal_per_class  gbdt    seed=5 F1=0.6818 (11.3s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] temporal_per_class  mlp     seed=5 F1=0.6978 (309.4s)
+[cicids2017_tl] temporal_per_class  logreg  seed=6 F1=0.6554 (35.0s)
+[cicids2017_tl] temporal_per_class  rf      seed=6 F1=0.8292 (109.6s)
+[cicids2017_tl] temporal_per_class  gbdt    seed=6 F1=0.7019 (11.7s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] temporal_per_class  mlp     seed=6 F1=0.7095 (313.0s)
+[cicids2017_tl] temporal_per_class  logreg  seed=7 F1=0.6554 (31.5s)
+[cicids2017_tl] temporal_per_class  rf      seed=7 F1=0.8297 (108.4s)
+[cicids2017_tl] temporal_per_class  gbdt    seed=7 F1=0.6809 (12.5s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] temporal_per_class  mlp     seed=7 F1=0.6971 (317.5s)
+[cicids2017_tl] temporal_per_class  logreg  seed=8 F1=0.6585 (44.6s)
+[cicids2017_tl] temporal_per_class  rf      seed=8 F1=0.8300 (110.8s)
+[cicids2017_tl] temporal_per_class  gbdt    seed=8 F1=0.7240 (12.2s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] temporal_per_class  mlp     seed=8 F1=0.6986 (306.8s)
+[cicids2017_tl] temporal_per_class  logreg  seed=9 F1=0.6567 (32.5s)
+[cicids2017_tl] temporal_per_class  rf      seed=9 F1=0.8301 (108.8s)
+[cicids2017_tl] temporal_per_class  gbdt    seed=9 F1=0.6959 (13.5s)
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+/home/void/secleak/.venv/lib/python3.14/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (60) reached and the optimization hasn't converged yet.
+  warnings.warn(
+[cicids2017_tl] temporal_per_class  mlp     seed=9 F1=0.6983 (302.6s)
+saved results/results_cicids2017_tl.csv

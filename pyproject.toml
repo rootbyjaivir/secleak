@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "secleak"
+version = "0.1.0"
+description = "SecLeak: integrity audit of network intrusion-detection benchmarks (duplication, temporal leakage, shortcuts, LLM memorisation)"
+requires-python = ">=3.10"
+dependencies = ["numpy", "pandas", "scikit-learn", "scipy", "matplotlib", "pyyaml"]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+parquet = ["pyarrow"]
+xgb = ["xgboost"]
+llm = ["anthropic"]
+
+[project.scripts]
+secleak = "secleak.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

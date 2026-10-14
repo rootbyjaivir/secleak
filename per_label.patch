@@ -1,0 +1,152 @@
+diff -u a/src/secleak/cli.py b/src/secleak/cli.py
+--- a/src/secleak/cli.py	2026-10-14 02:29:02.925686988 +0000
++++ b/src/secleak/cli.py	2026-10-14 02:31:01.133226217 +0000
+@@ -116,7 +116,8 @@
+     s = sub.add_parser("audit"); data_args(s); s.set_defaults(fn=cmd_audit)
+ 
+     s = sub.add_parser("run"); data_args(s)
+-    s.add_argument("--protocols", nargs="+", default=["random", "random_dedup", "temporal_global", "temporal_per_class"])
++    s.add_argument("--protocols", nargs="+", default=["random", "random_dedup", "temporal_global", "temporal_per_class",
++                                                    "temporal_per_label"])
+     s.add_argument("--models", nargs="+", default=["logreg", "rf", "gbdt", "mlp"])
+     s.add_argument("--seeds", type=int, default=5); s.add_argument("--no-tune", action="store_true")
+     s.add_argument("--max-train-rows", type=int, default=200_000); s.set_defaults(fn=cmd_run)
+diff -u a/src/secleak/diagnose.py b/src/secleak/diagnose.py
+--- a/src/secleak/diagnose.py	2026-10-14 02:29:02.926448452 +0000
++++ b/src/secleak/diagnose.py	2026-10-14 02:31:01.133408496 +0000
+@@ -30,7 +30,7 @@
+     return 2 * p / (1 + p) if p > 0 else 0.0
+ 
+ 
+-def diagnose(ds: Dataset, protocols: Iterable[str] = ("random", "temporal_per_class", "temporal_global"),
++def diagnose(ds: Dataset, protocols: Iterable[str] = ("random", "temporal_per_class", "temporal_per_label", "temporal_global"),
+              models: Iterable[str] = ("rf",), seeds: Iterable[int] = (0, 1),
+              gaps: Iterable[float] = (0.0, 0.01, 0.05, 0.10), test_size: float = 0.3,
+              max_train_rows: int | None = 200_000, max_test_rows: int | None = 200_000,
+diff -u a/src/secleak/protocols.py b/src/secleak/protocols.py
+--- a/src/secleak/protocols.py	2026-10-14 02:29:02.925545063 +0000
++++ b/src/secleak/protocols.py	2026-10-14 02:31:01.133171785 +0000
+@@ -5,6 +5,10 @@
+ P3  temporal_global   : earliest (1-test_size) of the timeline -> train, latest -> test
+ P4  temporal_per_class: same cut *within each class* (keeps class balance; for datasets
+                         where attack types occupy separate time windows, e.g. CICIDS2017)
++P4b temporal_per_label: same cut *within each raw attack label* (BENIGN, DoS Hulk, ...). Every label appears
++                        in both train and test, so the drop isolates drift WITHIN an attack type from the
++                        arrival of attack types the model never saw. (Added after the first CICIDS2017 run
++                        showed that P4's test attacks are only the latest campaigns; see PREREGISTRATION.)
+ P5  cross_dataset     : handled in experiments.py (needs two datasets)
+ """
+ from __future__ import annotations
+@@ -14,7 +18,7 @@
+ 
+ from .audit.dedup import dedup_mask
+ 
+-PROTOCOLS = ["random", "random_dedup", "temporal_global", "temporal_per_class"]
++PROTOCOLS = ["random", "random_dedup", "temporal_global", "temporal_per_class", "temporal_per_label"]
+ 
+ 
+ def _stratified_random(y: np.ndarray, test_size: float, rng: np.random.Generator,
+@@ -59,11 +63,26 @@
+     return np.sort(np.concatenate(tr)), np.sort(np.concatenate(te))
+ 
+ 
++def split_temporal_per_label(ds, test_size=0.3, seed=0, idx=None, gap_frac=0.0):
++    if ds.labels is None:
++        raise ValueError("temporal_per_label needs raw labels (Dataset.labels); reload the dataset")
++    base = np.arange(len(ds)) if idx is None else idx
++    tr, te = [], []
++    for lab in np.unique(ds.labels[base]):
++        ci = base[ds.labels[base] == lab]
++        ci = ci[np.argsort(ds.time[ci], kind="stable")]
++        cut = int(round(len(ci) * (1 - test_size)))
++        gap = int(round(len(ci) * gap_frac))
++        tr.append(ci[: cut - gap]); te.append(ci[cut:])
++    return np.sort(np.concatenate(tr)), np.sort(np.concatenate(te))
++
++
+ _SPLITTERS = {
+     "random": split_random,
+     "random_dedup": split_random_dedup,
+     "temporal_global": split_temporal_global,
+     "temporal_per_class": split_temporal_per_class,
++    "temporal_per_label": split_temporal_per_label,
+ }
+ 
+ 
+diff -u a/src/secleak/report.py b/src/secleak/report.py
+--- a/src/secleak/report.py	2026-10-14 02:29:02.925673994 +0000
++++ b/src/secleak/report.py	2026-10-14 02:31:01.133214302 +0000
+@@ -63,7 +63,7 @@
+     s = summarize(df, metric)
+     agg = s.groupby(["dataset", "protocol"])["mean"].mean().unstack("protocol")
+     order = [p for p in ["random", "random_dedup", "temporal_global", "temporal_per_class",
+-                         "cross_dataset"] if p in agg.columns]
++                         "temporal_per_label", "cross_dataset"] if p in agg.columns]
+     agg = agg[order]
+     ax = agg.plot(kind="bar", figsize=(8, 4.2), width=0.8, rot=0)
+     ax.set_ylabel(f"{metric} (mean over models/seeds)")
+--- a/tests/test_diagnose.py	2026-10-14 02:29:02.928888081 +0000
++++ b/tests/test_diagnose.py	2026-10-14 02:31:01.133719701 +0000
+@@ -37,7 +37,7 @@
+     ds = _multilabel_ds()
+     res = diagnose(ds, models=["rf"], seeds=[0], gaps=[0.0, 0.1], verbose=False)
+     comp = res["composition"]
+-    assert set(comp.protocol) == {"random", "temporal_per_class", "temporal_global"}
++    assert set(comp.protocol) == {"random", "temporal_per_class", "temporal_per_label", "temporal_global"}
+     p = comp.test_attack_frac.to_numpy()
+     assert np.allclose(comp.always_attack_f1, 2 * p / (1 + p))
+     pl = res["per_label"]
+@@ -58,3 +58,24 @@
+         txt = path.read_text()
+         for h in ("Split composition", "classified correctly", "Gap sweep", "always_attack_f1"):
+             assert h in txt
++
++
++def test_temporal_per_label_split_is_within_each_label_and_ordered():
++    from secleak.protocols import split
++    ds = _multilabel_ds(4000)
++    tr, te = split(ds, "temporal_per_label", test_size=0.3)
++    assert len(set(tr) & set(te)) == 0 and len(tr) + len(te) == len(ds)
++    for lab in np.unique(ds.labels):
++        t_tr, t_te = ds.time[tr][ds.labels[tr] == lab], ds.time[te][ds.labels[te] == lab]
++        assert len(t_tr) > 0 and len(t_te) > 0              # every label present on both sides
++        assert t_tr.max() <= t_te.min()                     # test strictly later than train, per label
++        n = (ds.labels == lab).sum()
++        assert abs(len(t_te) / n - 0.3) < 0.02
++
++
++def test_temporal_per_label_requires_raw_labels():
++    import pytest
++    from secleak.protocols import split
++    ds = _multilabel_ds(500); ds.labels = None
++    with pytest.raises(ValueError):
++        split(ds, "temporal_per_label")
+--- a/README.md	2026-10-14 02:29:02.929919856 +0000
++++ b/README.md	2026-10-14 02:31:01.133910561 +0000
+@@ -69,7 +69,8 @@
+ | `random` | stratified random 70% | 30% | nothing (the literature default) |
+ | `random_dedup` | after dropping duplicates + label-conflict groups | | duplicate leakage |
+ | `temporal_global` | earliest 70% of timeline | latest 30% | time leakage (changes class mix) |
+-| `temporal_per_class` | earliest 70% *within each class* | latest 30% | time leakage, keeps class balance |
++| `temporal_per_class` | earliest 70% *within benign and within attack* (binary class, all attack types pooled) | latest 30% | time leakage, keeps class balance; on CICIDS2017 the test attacks are only the latest campaigns |
++| `temporal_per_label` | earliest 70% *within each raw label* (BENIGN, DoS Hulk, ...) | latest 30% | drift within an attack type; every label is in both train and test |
+ | `cross_dataset` | all of A | all of B (harmonised features) | dataset-specific artefacts |
+ 
+ ## Caveats you must state in the paper
+--- a/docs/PREREGISTRATION.md	2026-10-14 02:29:02.926772927 +0000
++++ b/docs/PREREGISTRATION.md	2026-10-14 02:31:01.133519336 +0000
+@@ -38,3 +38,14 @@
+ ## Known threats to validity
+ Time-proxy for CSVs lacking timestamps; AM/PM heuristic in CIC-IDS2017; label noise in the benchmarks
+ themselves; model-zoo choice; temporal cut-point arbitrariness; census sampling bias.
++
++
++## Deviations and post-hoc additions (log every one; never edit the sections above)
++
++**2026-10-14 - added protocol `temporal_per_label` (post-hoc).**
++Reason: the first full CICIDS2017 run plus `secleak diagnose` showed that `temporal_per_class` splits within the
++binary classes (benign / attack), so its test attacks are only the latest campaigns (DDoS and PortScan);
++most attack types never appear in the test set. Its F1 drop therefore mixes drift within an attack type with
++the arrival of attack types seen little or never in training. `temporal_per_label` cuts within each raw label
++to separate the two. H1 and all other pre-registered analyses are still reported exactly as registered
++(with `temporal_per_class`); `temporal_per_label` is reported as exploratory/post-hoc, alongside them.

@@ -1,0 +1,27 @@
+nohup: ignoring input
+[secleak] cicids2017_tl: dropping 288,602 completely empty rows
+[diagnose] random              rf     seed=0 F1=0.9966 prec=0.996 rec=0.997 (always-attack F1=0.329) 39s
+[diagnose] random              gbdt   seed=0 F1=0.9970 prec=0.995 rec=0.999 (always-attack F1=0.329) 12s
+[diagnose] random              logreg seed=0 F1=0.8188 prec=0.842 rec=0.797 (always-attack F1=0.329) 36s
+[diagnose] temporal_per_class  rf     seed=0 F1=0.8313 prec=0.983 rec=0.720 (always-attack F1=0.329) 38s
+[diagnose] temporal_per_class  gbdt   seed=0 F1=0.7165 prec=0.719 rec=0.714 (always-attack F1=0.329) 12s
+[diagnose] temporal_per_class  logreg seed=0 F1=0.6573 prec=0.607 rec=0.717 (always-attack F1=0.329) 26s
+[diagnose] temporal_per_label  rf     seed=0 F1=0.9811 prec=0.984 rec=0.979 (always-attack F1=0.329) 38s
+[diagnose] temporal_per_label  gbdt   seed=0 F1=0.8388 prec=0.726 rec=0.994 (always-attack F1=0.329) 12s
+[diagnose] temporal_per_label  logreg seed=0 F1=0.7186 prec=0.645 rec=0.812 (always-attack F1=0.329) 28s
+[diagnose] temporal_global     rf     seed=0 F1=0.4392 prec=0.998 rec=0.282 (always-attack F1=0.508) 43s
+[diagnose] temporal_global     gbdt   seed=0 F1=0.4401 prec=0.998 rec=0.282 (always-attack F1=0.508) 10s
+[diagnose] temporal_global     logreg seed=0 F1=0.5424 prec=0.977 rec=0.375 (always-attack F1=0.508) 35s
+[diagnose] gap=0.0   rf     seed=0 F1=0.8313
+[diagnose] gap=0.0   gbdt   seed=0 F1=0.7165
+[diagnose] gap=0.0   logreg seed=0 F1=0.6573
+[diagnose] gap=0.01  rf     seed=0 F1=0.8311
+[diagnose] gap=0.01  gbdt   seed=0 F1=0.6849
+[diagnose] gap=0.01  logreg seed=0 F1=0.6563
+[diagnose] gap=0.05  rf     seed=0 F1=0.8312
+[diagnose] gap=0.05  gbdt   seed=0 F1=0.7145
+[diagnose] gap=0.05  logreg seed=0 F1=0.6553
+[diagnose] gap=0.1   rf     seed=0 F1=0.8313
+[diagnose] gap=0.1   gbdt   seed=0 F1=0.6787
+[diagnose] gap=0.1   logreg seed=0 F1=0.6781
+diagnostics -> results/diag_full/diagnose_cicids2017_tl/diagnostics.md

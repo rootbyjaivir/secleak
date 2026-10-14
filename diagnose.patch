@@ -1,0 +1,257 @@
+diff -u a/src/secleak/cli.py b/src/secleak/cli.py
+--- a/src/secleak/cli.py	2026-10-13 18:50:14.346402722 +0000
++++ b/src/secleak/cli.py	2026-10-14 01:48:11.116552267 +0000
+@@ -52,6 +52,14 @@
+     print("saved", path)
+ 
+ 
++def cmd_diagnose(args):
++    from .diagnose import diagnose, write_diagnostics
++    ds = _load(args)
++    res = diagnose(ds, models=args.models, seeds=range(args.seeds), gaps=args.gaps,
++                   max_train_rows=args.max_train_rows)
++    print("diagnostics ->", write_diagnostics(res, Path(args.out) / f"diagnose_{ds.name}", ds.name))
++
++
+ def cmd_cross(args):
+     from .data import harmonise, load_config, load_dataset, subsample  # noqa: F401
+     from .experiments import run_cross
+@@ -113,6 +121,11 @@
+     s.add_argument("--seeds", type=int, default=5); s.add_argument("--no-tune", action="store_true")
+     s.add_argument("--max-train-rows", type=int, default=200_000); s.set_defaults(fn=cmd_run)
+ 
++    s = sub.add_parser("diagnose"); data_args(s)
++    s.add_argument("--models", nargs="+", default=["rf"]); s.add_argument("--seeds", type=int, default=2)
++    s.add_argument("--gaps", nargs="+", type=float, default=[0.0, 0.01, 0.05, 0.10])
++    s.add_argument("--max-train-rows", type=int, default=200_000); s.set_defaults(fn=cmd_diagnose)
++
+     s = sub.add_parser("cross"); s.add_argument("a"); s.add_argument("b")
+     s.add_argument("--root", default="."); s.add_argument("--max-rows", type=int, default=200_000)
+     s.add_argument("--models", nargs="+", default=["logreg", "rf", "gbdt"])
+diff -u a/src/secleak/data.py b/src/secleak/data.py
+--- a/src/secleak/data.py	2026-10-13 18:50:14.346333451 +0000
++++ b/src/secleak/data.py	2026-10-14 01:48:11.116502352 +0000
+@@ -22,6 +22,7 @@
+     time: np.ndarray                # float seconds (or proxy ordinal); length n
+     time_is_proxy: bool = False     # True if no real timestamps exist
+     meta: dict = field(default_factory=dict)
++    labels: np.ndarray | None = None  # raw (stripped) label strings, e.g. "DoS Hulk"; for diagnostics
+ 
+     def __len__(self) -> int:
+         return len(self.y)
+@@ -115,13 +116,14 @@
+         keep = ~np.isnan(t)
+         df, y, t = df.loc[keep].reset_index(drop=True), y[keep], t[keep]
+ 
++    labels = df[label_col].astype(str).str.strip().to_numpy()
+     drop = set(cfg.get("drop_cols", [])) | {label_col, "__file_idx", "__row_idx"}
+     X = df.drop(columns=[c for c in drop if c in df.columns])
+     X = X.replace([np.inf, -np.inf], np.nan)
+     # constant string columns / free text are useless; keep it simple & deterministic
+     return Dataset(name=name, X=X.reset_index(drop=True), y=y, time=t, time_is_proxy=proxy,
+                    meta={"n_raw": len(df), "n_blank_dropped": n_blank, "n_bad_time_dropped": n_bad_time,
+-                         "time_kind": kind})
++                         "time_kind": kind}, labels=labels)
+ 
+ 
+ def harmonise(ds: Dataset, mapping: dict) -> pd.DataFrame:
+@@ -139,4 +141,5 @@
+     rng = np.random.default_rng(seed)
+     idx = np.sort(rng.choice(len(ds), max_rows, replace=False))
+     return Dataset(ds.name, ds.X.iloc[idx].reset_index(drop=True), ds.y[idx], ds.time[idx],
+-                   ds.time_is_proxy, {**ds.meta, "subsampled_to": max_rows})
++                   ds.time_is_proxy, {**ds.meta, "subsampled_to": max_rows},
++                   None if ds.labels is None else ds.labels[idx])
+diff -u a/src/secleak/diagnose.py b/src/secleak/diagnose.py
+--- a/src/secleak/diagnose.py	1970-01-01 00:00:00.000000000 +0000
++++ b/src/secleak/diagnose.py	2026-10-14 01:48:11.116894735 +0000
+@@ -0,0 +1,126 @@
++"""Diagnostics that explain WHY performance changes between protocols.
++
++1. composition      : attack share and per-label counts in train/test for each protocol, plus the F1 of the
++                      trivial "always predict attack" classifier (2p/(1+p)). A model near that value has
++                      learned nothing useful on that split.
++2. per-label recall : fraction of each raw label (BENIGN, DoS Hulk, ...) classified correctly. Shows whether a
++                      temporal drop comes from benign drift (false alarms), unseen attack types, or both.
++3. gap sweep        : temporal_per_class with an increasing gap between the end of train and the start of
++                      test. If F1 keeps falling as the gap widens, near-boundary (same-session) flows were
++                      helping the model.
++"""
++from __future__ import annotations
++
++import time
++from pathlib import Path
++from typing import Iterable
++
++import numpy as np
++import pandas as pd
++
++from .data import Dataset
++from .experiments import _cap
++from .metrics import score
++from .models import make_model
++from .protocols import split
++
++
++def always_attack_f1(p: float) -> float:
++    """F1 (attack = positive) of predicting 'attack' for every row when the attack share is p."""
++    return 2 * p / (1 + p) if p > 0 else 0.0
++
++
++def diagnose(ds: Dataset, protocols: Iterable[str] = ("random", "temporal_per_class", "temporal_global"),
++             models: Iterable[str] = ("rf",), seeds: Iterable[int] = (0, 1),
++             gaps: Iterable[float] = (0.0, 0.01, 0.05, 0.10), test_size: float = 0.3,
++             max_train_rows: int | None = 200_000, max_test_rows: int | None = 200_000,
++             verbose: bool = True) -> dict[str, pd.DataFrame]:
++    X = ds.X
++    labels = ds.labels if ds.labels is not None else np.where(ds.y == 1, "ATTACK", "BENIGN")
++    comp, comp_lab, rec, gap_rows = [], [], [], []
++
++    for protocol in protocols:
++        for seed in seeds:
++            tr, te = split(ds, protocol, test_size=test_size, seed=seed)
++            rng = np.random.default_rng(seed)
++            tr, te = _cap(tr, max_train_rows, rng), _cap(te, max_test_rows, rng)
++            p = float(ds.y[te].mean())
++            comp.append(dict(protocol=protocol, seed=seed, n_train=len(tr), n_test=len(te),
++                             train_attack_frac=float(ds.y[tr].mean()), test_attack_frac=p,
++                             always_attack_f1=always_attack_f1(p)))
++            for part, idx in (("train", tr), ("test", te)):
++                for lab, n in zip(*np.unique(labels[idx], return_counts=True)):
++                    comp_lab.append(dict(protocol=protocol, seed=seed, part=part, label=lab, n=int(n)))
++            for mname in models:
++                t0 = time.time()
++                m = make_model(mname, seed, n_jobs=-1).fit(X.iloc[tr], ds.y[tr])
++                pred = m.predict(X.iloc[te])
++                yt, lt = ds.y[te], labels[te]
++                for lab in np.unique(lt):
++                    mk = lt == lab
++                    rec.append(dict(protocol=protocol, model=mname, seed=seed, label=lab,
++                                    kind="attack" if yt[mk][0] == 1 else "benign",
++                                    n_train=int((labels[tr] == lab).sum()), n_test=int(mk.sum()),
++                                    correct_frac=float((pred[mk] == yt[mk]).mean())))
++                if verbose:
++                    sc = score(yt, pred)
++                    print(f"[diagnose] {protocol:<19} {mname:<6} seed={seed} F1={sc['f1_attack']:.4f} "
++                          f"prec={sc['precision']:.3f} rec={sc['recall']:.3f} "
++                          f"(always-attack F1={always_attack_f1(p):.3f}) {time.time()-t0:.0f}s", flush=True)
++
++    for gap in gaps:
++        for seed in seeds:
++            tr, te = split(ds, "temporal_per_class", test_size=test_size, seed=seed, gap_frac=gap)
++            rng = np.random.default_rng(seed)
++            tr, te = _cap(tr, max_train_rows, rng), _cap(te, max_test_rows, rng)
++            for mname in models:
++                m = make_model(mname, seed, n_jobs=-1).fit(X.iloc[tr], ds.y[tr])
++                sc = score(ds.y[te], m.predict(X.iloc[te]))
++                gap_rows.append(dict(gap_frac=gap, model=mname, seed=seed, n_train=len(tr), n_test=len(te), **sc))
++                if verbose:
++                    print(f"[diagnose] gap={gap:<5} {mname:<6} seed={seed} F1={sc['f1_attack']:.4f}", flush=True)
++
++    return {"composition": pd.DataFrame(comp), "label_counts": pd.DataFrame(comp_lab),
++            "per_label": pd.DataFrame(rec), "gap_sweep": pd.DataFrame(gap_rows)}
++
++
++def _md(df: pd.DataFrame, floatfmt: str = "{:.3f}") -> str:
++    def cell(col, v):
++        if isinstance(v, (float, np.floating)):
++            if np.isnan(v):
++                return "-"
++            return f"{v:,.0f}" if str(col).startswith("n_") else floatfmt.format(v)
++        return str(v)
++    cols = list(df.columns)
++    out = ["| " + " | ".join(cols) + " |", "|" + "---|" * len(cols)]
++    for _, r in df.iterrows():
++        out.append("| " + " | ".join(cell(c, r[c]) for c in cols) + " |")
++    return "\n".join(out)
++
++
++def write_diagnostics(res: dict[str, pd.DataFrame], out: str | Path, name: str) -> Path:
++    out = Path(out); out.mkdir(parents=True, exist_ok=True)
++    for k, v in res.items():
++        v.to_csv(out / f"{k}.csv", index=False)
++    comp = res["composition"].groupby("protocol", as_index=False).mean(numeric_only=True).drop(columns=["seed"])
++    pl = (res["per_label"].groupby(["protocol", "kind", "label"], as_index=False)
++          .agg(n_train=("n_train", "mean"), n_test=("n_test", "mean"), correct_frac=("correct_frac", "mean")))
++    pl = pl.pivot_table(index=["kind", "label"], columns="protocol", values="correct_frac").reset_index()
++    cnt = (res["label_counts"].query("seed == @res['label_counts'].seed.min()")
++           .pivot_table(index="label", columns=["protocol", "part"], values="n", aggfunc="sum").fillna(0))
++    gap = res["gap_sweep"].groupby(["gap_frac", "model"], as_index=False).agg(
++        f1_attack=("f1_attack", "mean"), precision=("precision", "mean"), recall=("recall", "mean"))
++    lines = [f"# Diagnostics: {name}", "",
++             "## 1. Split composition and trivial baseline",
++             "`always_attack_f1` is the F1 of predicting 'attack' for every row. A model near this value on a "
++             "split has learned nothing useful there.", "", _md(comp), "",
++             "## 2. Fraction of each label classified correctly",
++             "For attack labels this is recall; for BENIGN it is specificity (1 - false-alarm rate). "
++             "Missing cell = label absent from that test set.", "", _md(pl), "",
++             "## 3. Gap sweep (temporal_per_class, gap between end of train and start of test)", "",
++             _md(gap), "",
++             "> Temporal splits are deterministic, so seeds only vary the model. These tables describe one "
++             "fixed partition of one dataset, not sampling uncertainty over data.", ""]
++    path = out / "diagnostics.md"
++    path.write_text("\n".join(lines))
++    return path
+--- a/tests/test_diagnose.py	1970-01-01 00:00:00.000000000 +0000
++++ b/tests/test_diagnose.py	2026-10-14 01:48:11.117881744 +0000
+@@ -0,0 +1,60 @@
++import tempfile
++import numpy as np
++import pandas as pd
++
++from secleak.data import frame_to_dataset, subsample
++from secleak.diagnose import always_attack_f1, diagnose, write_diagnostics
++from secleak.synthetic import make_synthetic
++
++CFG = dict(label_col="label", benign_values=["BENIGN"], time_col="timestamp",
++           time_kind="iso", drop_cols=["timestamp"])
++
++
++def _multilabel_ds(n=3000):
++    df = make_synthetic(n=n, seed=1)
++    atk = df["label"] == "ATTACK"
++    late = df["timestamp"] > df["timestamp"].median()
++    df.loc[atk & ~late, "label"] = "Attack A"       # attack types live in different time windows
++    df.loc[atk & late, "label"] = "Attack B"
++    return frame_to_dataset(df, "syn_multi", CFG)
++
++
++def test_always_attack_f1_formula():
++    assert abs(always_attack_f1(0.5) - 2 / 3) < 1e-12
++    assert always_attack_f1(0.0) == 0.0
++    assert abs(always_attack_f1(1.0) - 1.0) < 1e-12
++
++
++def test_raw_labels_kept_and_aligned_after_subsample():
++    ds = _multilabel_ds()
++    assert set(ds.labels) == {"BENIGN", "Attack A", "Attack B"}
++    sub = subsample(ds, 1000, seed=0)
++    assert len(sub.labels) == len(sub.y) == 1000
++    assert ((sub.labels != "BENIGN").astype(int) == sub.y).all()   # labels still match y
++
++
++def test_diagnose_outputs_are_consistent():
++    ds = _multilabel_ds()
++    res = diagnose(ds, models=["rf"], seeds=[0], gaps=[0.0, 0.1], verbose=False)
++    comp = res["composition"]
++    assert set(comp.protocol) == {"random", "temporal_per_class", "temporal_global"}
++    p = comp.test_attack_frac.to_numpy()
++    assert np.allclose(comp.always_attack_f1, 2 * p / (1 + p))
++    pl = res["per_label"]
++    assert (pl.correct_frac.between(0, 1)).all()
++    assert set(pl[pl.kind == "benign"].label) == {"BENIGN"}
++    # global temporal cut: the late attack type must dominate the test window, early type may be absent
++    tl = res["label_counts"].query("protocol == 'temporal_global' and part == 'test'").set_index("label").n
++    assert tl.get("Attack B", 0) > tl.get("Attack A", 0)
++    gs = res["gap_sweep"].sort_values("gap_frac")
++    assert len(gs) == 2 and gs.n_train.iloc[0] > gs.n_train.iloc[1]    # bigger gap -> smaller train
++
++
++def test_write_diagnostics_creates_report():
++    ds = _multilabel_ds(2000)
++    res = diagnose(ds, models=["rf"], seeds=[0], gaps=[0.0], verbose=False)
++    with tempfile.TemporaryDirectory() as tmp:
++        path = write_diagnostics(res, tmp, "syn_multi")
++        txt = path.read_text()
++        for h in ("Split composition", "classified correctly", "Gap sweep", "always_attack_f1"):
++            assert h in txt

@@ -26,6 +26,8 @@ unsw_nb15_raw:            # UNSW-NB15_1..4.csv (headerless, 49 columns)
           ct_src_dport_ltm, ct_dst_sport_ltm, ct_dst_src_ltm, attack_cat, Label]
   label_col: Label
   attack_value: 1
+  category_col: attack_cat   # attack type, blank for normal traffic
+  category_fill: Normal
   time_col: Stime
   time_kind: epoch_s
   drop_cols: [srcip, dstip, sport, Stime, Ltime, attack_cat]
@@ -33,6 +35,8 @@ bot_iot:                  # BoT-IoT CSVs (full or 5%)
   glob: data/raw/BoT-IoT/*.csv
   label_col: attack
   attack_value: 1
+  category_col: category
+  category_fill: Normal
   time_col: stime
   time_kind: epoch_s
   drop_cols: [pkSeqID, saddr, daddr, sport, stime, ltime, category, subcategory]

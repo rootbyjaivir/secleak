@@ -87,3 +87,17 @@ def test_mixed_timestamp_formats_and_blank_rows_are_not_silently_lost():
         bad.to_csv(d / "Tuesday.csv", index=False, encoding="cp1252")
         with pytest.raises(ValueError):
             load_dataset("cicids2017_tl", root=root)
+
+
+def test_category_col_supplies_raw_labels_and_fills_blank_normals():
+    from secleak.data import frame_to_dataset
+    df = pd.DataFrame({"f": np.arange(8.0), "Label": [0, 0, 1, 1, 1, 0, 1, 1],
+                       "attack_cat": [np.nan, " ", "Fuzzers ", "DoS", "Fuzzers", np.nan, np.nan, "DoS"],
+                       "Stime": np.arange(8) * 10.0})
+    cfg = dict(label_col="Label", attack_value=1, category_col="attack_cat", category_fill="Normal",
+               time_col="Stime", time_kind="epoch_s", drop_cols=["attack_cat", "Stime"])
+    ds = frame_to_dataset(df, "unsw_like", cfg)
+    assert list(ds.labels) == ["Normal", "Normal", "Fuzzers", "DoS", "Fuzzers", "Normal",
+                               "attack_uncategorised", "DoS"]
+    assert list(ds.y) == [0, 0, 1, 1, 1, 0, 1, 1]
+    assert "attack_cat" not in ds.X.columns            # category must never leak into the features

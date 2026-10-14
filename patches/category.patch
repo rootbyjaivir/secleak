@@ -1,0 +1,80 @@
+diff -u a/src/secleak/data.py b/src/secleak/data.py
+--- a/src/secleak/data.py	2026-10-14 03:59:18.817358742 +0000
++++ b/src/secleak/data.py	2026-10-14 03:59:28.335084602 +0000
+@@ -116,7 +116,19 @@
+         keep = ~np.isnan(t)
+         df, y, t = df.loc[keep].reset_index(drop=True), y[keep], t[keep]
+ 
+-    labels = df[label_col].astype(str).str.strip().to_numpy()
++    # Raw labels for per-label diagnostics. Some datasets keep the attack type in a separate column
++    # (UNSW-NB15 `attack_cat`, blank for normal traffic; BoT-IoT `category`): use it when configured.
++    cat_col = cfg.get("category_col")
++    if cat_col and cat_col in df.columns:
++        fill = str(cfg.get("category_fill", "unknown"))
++        labels = df[cat_col].fillna(fill).astype(str).str.strip().replace({"": fill}).to_numpy()
++        labels = np.where((y == 1) & (labels == fill), "attack_uncategorised", labels)
++        mixed = pd.Series(y).groupby(labels).nunique()
++        if (mixed > 1).any():
++            print(f"[secleak] {name}: labels with both benign and attack rows: "
++                  f"{sorted(mixed[mixed > 1].index)}", file=sys.stderr)
++    else:
++        labels = df[label_col].astype(str).str.strip().to_numpy()
+     drop = set(cfg.get("drop_cols", [])) | {label_col, "__file_idx", "__row_idx"}
+     X = df.drop(columns=[c for c in drop if c in df.columns])
+     X = X.replace([np.inf, -np.inf], np.nan)
+--- a/tests/test_loader.py	2026-10-14 03:59:18.821397870 +0000
++++ b/tests/test_loader.py	2026-10-14 03:59:28.335662971 +0000
+@@ -87,3 +87,17 @@
+         bad.to_csv(d / "Tuesday.csv", index=False, encoding="cp1252")
+         with pytest.raises(ValueError):
+             load_dataset("cicids2017_tl", root=root)
++
++
++def test_category_col_supplies_raw_labels_and_fills_blank_normals():
++    from secleak.data import frame_to_dataset
++    df = pd.DataFrame({"f": np.arange(8.0), "Label": [0, 0, 1, 1, 1, 0, 1, 1],
++                       "attack_cat": [np.nan, " ", "Fuzzers ", "DoS", "Fuzzers", np.nan, np.nan, "DoS"],
++                       "Stime": np.arange(8) * 10.0})
++    cfg = dict(label_col="Label", attack_value=1, category_col="attack_cat", category_fill="Normal",
++               time_col="Stime", time_kind="epoch_s", drop_cols=["attack_cat", "Stime"])
++    ds = frame_to_dataset(df, "unsw_like", cfg)
++    assert list(ds.labels) == ["Normal", "Normal", "Fuzzers", "DoS", "Fuzzers", "Normal",
++                               "attack_uncategorised", "DoS"]
++    assert list(ds.y) == [0, 0, 1, 1, 1, 0, 1, 1]
++    assert "attack_cat" not in ds.X.columns            # category must never leak into the features
+--- a/configs/datasets.yaml	2026-10-14 03:59:18.819697038 +0000
++++ b/configs/datasets.yaml	2026-10-14 03:59:28.335430870 +0000
+@@ -26,6 +26,8 @@
+           ct_src_dport_ltm, ct_dst_sport_ltm, ct_dst_src_ltm, attack_cat, Label]
+   label_col: Label
+   attack_value: 1
++  category_col: attack_cat   # attack type, blank for normal traffic
++  category_fill: Normal
+   time_col: Stime
+   time_kind: epoch_s
+   drop_cols: [srcip, dstip, sport, Stime, Ltime, attack_cat]
+@@ -33,6 +35,8 @@
+   glob: data/raw/BoT-IoT/*.csv
+   label_col: attack
+   attack_value: 1
++  category_col: category
++  category_fill: Normal
+   time_col: stime
+   time_kind: epoch_s
+   drop_cols: [pkSeqID, saddr, daddr, sport, stime, ltime, category, subcategory]
+--- a/docs/DATASETS.md	2026-10-14 03:59:18.820093654 +0000
++++ b/docs/DATASETS.md	2026-10-14 03:59:28.335503174 +0000
+@@ -22,6 +22,13 @@
+ * Different CSV copies of the same dataset differ (flow-construction fixes by later authors).
+   Record the exact copy and SHA-256 in the paper: `sha256sum data/raw/**/*.csv > data/CHECKSUMS.txt`.
+ 
++## Raw attack-type labels
++`category_col` (UNSW-NB15 `attack_cat`, BoT-IoT `category`) feeds `Dataset.labels`, which the per-label
++protocol (`temporal_per_label`) and `secleak diagnose` use. Without it they fall back to the binary label and
++`temporal_per_label` becomes identical to `temporal_per_class`. UNSW-NB15 raw files contain label variants
++(e.g. `Backdoor`/`Backdoors`, trailing spaces); the loader strips whitespace but does NOT merge variants:
++inspect `label_counts.csv` and note any merge you apply.
++
+ ## Adding a dataset
+ Add a preset in `configs/datasets.yaml` (`glob`, `label_col`, `benign_values` or `attack_value`,
+ `time_col` + `time_kind` or `file_order`, `drop_cols`) and, for cross-dataset tests, a `harmonise` map.

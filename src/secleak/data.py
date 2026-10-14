@@ -116,7 +116,19 @@ def frame_to_dataset(df: pd.DataFrame, name: str, cfg: dict) -> Dataset:
         keep = ~np.isnan(t)
         df, y, t = df.loc[keep].reset_index(drop=True), y[keep], t[keep]
 
-    labels = df[label_col].astype(str).str.strip().to_numpy()
+    # Raw labels for per-label diagnostics. Some datasets keep the attack type in a separate column
+    # (UNSW-NB15 `attack_cat`, blank for normal traffic; BoT-IoT `category`): use it when configured.
+    cat_col = cfg.get("category_col")
+    if cat_col and cat_col in df.columns:
+        fill = str(cfg.get("category_fill", "unknown"))
+        labels = df[cat_col].fillna(fill).astype(str).str.strip().replace({"": fill}).to_numpy()
+        labels = np.where((y == 1) & (labels == fill), "attack_uncategorised", labels)
+        mixed = pd.Series(y).groupby(labels).nunique()
+        if (mixed > 1).any():
+            print(f"[secleak] {name}: labels with both benign and attack rows: "
+                  f"{sorted(mixed[mixed > 1].index)}", file=sys.stderr)
+    else:
+        labels = df[label_col].astype(str).str.strip().to_numpy()
     drop = set(cfg.get("drop_cols", [])) | {label_col, "__file_idx", "__row_idx"}
     X = df.drop(columns=[c for c in drop if c in df.columns])
     X = X.replace([np.inf, -np.inf], np.nan)

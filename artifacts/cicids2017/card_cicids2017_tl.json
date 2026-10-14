@@ -1,0 +1,65 @@
+{
+  "dataset": "cicids2017_tl",
+  "n_rows": 2830743,
+  "n_features": 79,
+  "has_real_timestamps": true,
+  "time_kind": "cicids_dmy",
+  "duplication": {
+    "n_rows": 2830743,
+    "exact_dup_rows_frac": 0.1428663781911675,
+    "exact_removable_frac": 0.10912859274049251,
+    "near_removable_frac": 0.13154284935085947,
+    "label_conflict_groups": 697,
+    "label_conflict_rows_frac": 0.0024792077557023013,
+    "attack_frac": 0.19699633629757277
+  },
+  "train_test_overlap": {
+    "random": {
+      "exact": {
+        "test_rows_in_train_frac": 0.1295348807086007,
+        "lookup_acc_on_hits": 0.9849187302279917
+      },
+      "near": {
+        "test_rows_in_train_frac": 0.15613920018652344,
+        "lookup_acc_on_hits": 0.9870736140335
+      }
+    },
+    "temporal_per_class": {
+      "exact": {
+        "test_rows_in_train_frac": 0.08522496446751913,
+        "lookup_acc_on_hits": 0.9925941278065631
+      },
+      "near": {
+        "test_rows_in_train_frac": 0.09909175799524977,
+        "lookup_acc_on_hits": 0.9932264619552946
+      }
+    }
+  },
+  "top_shortcuts": [
+    {
+      "feature": "Packet Length Std",
+      "f1_random": 0.7831726871453022,
+      "f1_temporal_per_class": 0.7470103640712198
+    },
+    {
+      "feature": "Packet Length Variance",
+      "f1_random": 0.7831726871453022,
+      "f1_temporal_per_class": 0.7470103640712198
+    },
+    {
+      "feature": "Total Length of Bwd Packets",
+      "f1_random": 0.7384494224711236,
+      "f1_temporal_per_class": 0.731588979379657
+    },
+    {
+      "feature": "Subflow Bwd Bytes",
+      "f1_random": 0.7384494224711236,
+      "f1_temporal_per_class": 0.731588979379657
+    },
+    {
+      "feature": "Packet Length Mean",
+      "f1_random": 0.7277317624130752,
+      "f1_temporal_per_class": 0.6165958693423172
+    }
+  ]
+}

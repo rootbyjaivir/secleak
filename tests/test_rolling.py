@@ -50,3 +50,20 @@ def test_last_block_is_never_an_origin_and_bad_origins_are_rejected():
         rolling(ds, n_blocks=5, first_origin=4, models=["logreg"], seeds=[0], verbose=False)
     df = rolling(ds, n_blocks=5, first_origin=1, models=["logreg"], seeds=[0], verbose=False)
     assert df.origin.max() == 3
+
+
+def test_explain_origin_breakdowns_are_consistent():
+    from secleak.rolling import explain_origin, write_explain
+    ds = _multilabel_ds(5000)
+    b = assign_blocks(ds, 5)
+    res = explain_origin(ds, 5, 3, model="rf", seed=0)
+    n_test = (b == 3).sum()
+    assert res["meta"]["n_test"] == n_test and res["labels"].n_test.sum() == n_test
+    n_ben = ((b == 3) & (ds.y == 0)).sum()
+    assert res["fp_by_day"].n_benign.sum() == n_ben                      # every benign test row bucketed once
+    assert (res["fp_by_day"].false_alarms <= res["fp_by_day"].n_benign).all()
+    d = res["drift"].shift_in_past_std.abs().to_numpy()
+    assert len(d) > 0 and (np.diff(d) <= 1e-12).all()                    # sorted by absolute shift
+    with tempfile.TemporaryDirectory() as tmp:
+        txt = write_explain(res, tmp, "syn").read_text()
+        assert "False alarms on benign flows by day" in txt and "covariate shift" in txt

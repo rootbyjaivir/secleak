@@ -131,3 +131,67 @@ def write_rolling(df: pd.DataFrame, out: str | Path, name: str, n_blocks: int, f
     path = out / "rolling_report.md"
     path.write_text("\n".join(lines))
     return path
+
+
+def explain_origin(ds: Dataset, n_blocks: int, k: int, model: str = "gbdt", seed: int = 0,
+                   max_train_rows: int | None = 200_000, cap_mode: str = "uniform",
+                   top_features: int = 15) -> dict:
+    """Why does one origin behave differently? Fit the past-only model for origin k and break the errors on
+    block k down by label, by time of day (false alarms on benign rows) and by covariate shift of benign traffic."""
+    blocks = assign_blocks(ds, n_blocks)
+    lab = _labels(ds)
+    rng = np.random.default_rng(1000 * seed + k)
+    past, _, test = make_fold(ds, blocks, k, rng, max_train_rows, None, cap_mode)
+    m = make_model(model, seed, n_jobs=-1).fit(ds.X.iloc[past], ds.y[past])
+    pred = m.predict(ds.X.iloc[test])
+    yt, lt, tt = ds.y[test], lab[test], ds.time[test]
+
+    labels = pd.DataFrame([dict(label=n, kind="benign" if yt[lt == n][0] == 0 else "attack",
+                                n_train=int((lab[past] == n).sum()), n_test=int((lt == n).sum()),
+                                correct_frac=float((pred[lt == n] == yt[lt == n]).mean()))
+                           for n in np.unique(lt)])
+
+    ben = yt == 0
+    if ds.time_is_proxy:
+        day = hour = pd.Series(pd.qcut(pd.Series(tt[ben]).rank(method="first"), 10, labels=False).astype(str)).to_numpy()
+    else:
+        stamp = pd.to_datetime(tt[ben], unit="s")
+        day, hour = stamp.strftime("%Y-%m-%d"), stamp.strftime("%Y-%m-%d %H:00")
+    fa = pd.DataFrame({"day": day, "hour": hour, "false_alarm": pred[ben] == 1})
+    fp_by_day = fa.groupby("day").agg(n_benign=("false_alarm", "size"), false_alarms=("false_alarm", "sum")).reset_index()
+    fp_by_day["fp_rate"] = fp_by_day.false_alarms / fp_by_day.n_benign
+    hrs = fa.groupby("hour").agg(n_benign=("false_alarm", "size"), false_alarms=("false_alarm", "sum")).reset_index()
+    hrs["fp_rate"] = hrs.false_alarms / hrs.n_benign
+    worst_hours = hrs[hrs.n_benign >= 100].sort_values("fp_rate", ascending=False).head(10).reset_index(drop=True)
+
+    num = ds.X.select_dtypes("number").columns
+    bp = np.flatnonzero((blocks < k) & (ds.y == 0)); bt = test[ben]
+    bp, bt = _cap(bp, 200_000, rng), _cap(bt, 200_000, rng)
+    mp, sp, mt = ds.X.iloc[bp][num].mean(), ds.X.iloc[bp][num].std(), ds.X.iloc[bt][num].mean()
+    drift = pd.DataFrame({"feature": num, "mean_past_benign": mp.to_numpy(), "mean_test_benign": mt.to_numpy(),
+                          "shift_in_past_std": ((mt - mp) / (sp + 1e-9)).to_numpy()})
+    drift = drift.reindex(drift.shift_in_past_std.abs().sort_values(ascending=False).index).head(top_features)
+    sc = score(yt, pred)
+    return dict(labels=labels, fp_by_day=fp_by_day, worst_hours=worst_hours, drift=drift.reset_index(drop=True),
+                meta=dict(model=model, origin=k, n_blocks=n_blocks, n_train=len(past), n_test=len(test), **sc))
+
+
+def write_explain(res: dict, out: str | Path, name: str) -> Path:
+    from .diagnose import _md
+    out = Path(out); out.mkdir(parents=True, exist_ok=True)
+    for key in ("labels", "fp_by_day", "worst_hours", "drift"):
+        res[key].to_csv(out / f"explain_{key}.csv", index=False)
+    m = res["meta"]
+    lines = [f"# Origin {m['origin']} explained ({name}, {m['model']}, untuned, past-only training)", "",
+             f"F1={m['f1_attack']:.3f} precision={m['precision']:.3f} recall={m['recall']:.3f} "
+             f"(n_train={m['n_train']:,}, n_test={m['n_test']:,})", "",
+             "## 1. Fraction of each label classified correctly (BENIGN row = 1 - false-alarm rate)", "",
+             _md(res["labels"]), "", "## 2. False alarms on benign flows by day", "", _md(res["fp_by_day"]), "",
+             "## 3. Worst hours (>=100 benign flows)", "", _md(res["worst_hours"]), "",
+             "## 4. Benign covariate shift, past vs test block (in past-benign standard deviations)", "",
+             _md(res["drift"], "{:.3f}"), "",
+             "> Descriptive only: one model, one seed, one partition. Time bucketing uses the loader's timestamps "
+             "(including the CICIDS2017 AM/PM heuristic).", ""]
+    path = out / "explain.md"
+    path.write_text("\n".join(lines))
+    return path

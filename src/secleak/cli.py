@@ -72,6 +72,14 @@ def cmd_rolling(args):
                                        args.blocks, args.first_origin))
 
 
+def cmd_rolling_explain(args):
+    from .rolling import explain_origin, write_explain
+    ds = _load(args)
+    res = explain_origin(ds, args.blocks, args.origin, model=args.model, seed=args.seed,
+                         max_train_rows=args.max_train_rows, cap_mode=args.cap_mode)
+    print("explain ->", write_explain(res, Path(args.out) / f"explain_{ds.name}_k{args.origin}", ds.name))
+
+
 def cmd_cross(args):
     from .data import harmonise, load_config, load_dataset, subsample  # noqa: F401
     from .experiments import run_cross
@@ -152,6 +160,13 @@ def main(argv=None):
     s.add_argument("--max-test-rows", type=int, default=0, help="0 = evaluate on ALL rows of the test block")
     s.add_argument("--cap-mode", choices=["uniform", "label_floor"], default="uniform")
     s.set_defaults(fn=cmd_rolling)
+
+    s = sub.add_parser("rolling-explain"); data_args(s)
+    s.add_argument("--blocks", type=int, default=10); s.add_argument("--origin", type=int, required=True)
+    s.add_argument("--model", default="gbdt"); s.add_argument("--seed", type=int, default=0)
+    s.add_argument("--max-train-rows", type=int, default=200_000)
+    s.add_argument("--cap-mode", choices=["uniform", "label_floor"], default="uniform")
+    s.set_defaults(fn=cmd_rolling_explain)
 
     s = sub.add_parser("cross"); s.add_argument("a"); s.add_argument("b")
     s.add_argument("--root", default="."); s.add_argument("--max-rows", type=int, default=200_000)

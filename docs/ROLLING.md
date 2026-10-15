@@ -17,3 +17,9 @@ timestamps (and the CICIDS2017 AM/PM heuristic) determine the ordering; one data
 
 Post-hoc status: added after the first CICIDS2017 results (see the Deviations section of
 docs/PREREGISTRATION.md); report it as exploratory next to the pre-registered analyses.
+
+## Explaining one origin (`secleak rolling-explain`)
+`secleak rolling-explain DATASET --origin K --model gbdt` refits the past-only model for origin K and breaks the
+errors on block K down by label, by day/hour of false alarms on benign flows, and by covariate shift of benign
+traffic (past vs test, in past-benign standard deviations). Descriptive only; use it to decide what to
+investigate, not as evidence of a cause.

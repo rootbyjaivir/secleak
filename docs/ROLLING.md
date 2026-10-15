@@ -21,5 +21,5 @@ docs/PREREGISTRATION.md); report it as exploratory next to the pre-registered an
 ## Explaining one origin (`secleak rolling-explain`)
 `secleak rolling-explain DATASET --origin K --model gbdt` refits the past-only model for origin K and breaks the
 errors on block K down by label, by day/hour of false alarms on benign flows, and by covariate shift of benign
-traffic (past vs test, in past-benign standard deviations). Descriptive only; use it to decide what to
+traffic (difference of means divided by the pooled past/test std). Descriptive only; use it to decide what to
 investigate, not as evidence of a cause.

@@ -167,10 +167,15 @@ def explain_origin(ds: Dataset, n_blocks: int, k: int, model: str = "gbdt", seed
     num = ds.X.select_dtypes("number").columns
     bp = np.flatnonzero((blocks < k) & (ds.y == 0)); bt = test[ben]
     bp, bt = _cap(bp, 200_000, rng), _cap(bt, 200_000, rng)
-    mp, sp, mt = ds.X.iloc[bp][num].mean(), ds.X.iloc[bp][num].std(), ds.X.iloc[bt][num].mean()
+    mp, sp = ds.X.iloc[bp][num].mean(), ds.X.iloc[bp][num].std()
+    mt, st = ds.X.iloc[bt][num].mean(), ds.X.iloc[bt][num].std()
+    # standardise by the POOLED std (past and test): a near-constant feature in the past made the old
+    # past-only std blow up (shifts of ~1e6 for flags that changed from 0.000 to 0.001)
+    scale = np.sqrt((sp ** 2 + st ** 2) / 2)
     drift = pd.DataFrame({"feature": num, "mean_past_benign": mp.to_numpy(), "mean_test_benign": mt.to_numpy(),
-                          "shift_in_past_std": ((mt - mp) / (sp + 1e-9)).to_numpy()})
-    drift = drift.reindex(drift.shift_in_past_std.abs().sort_values(ascending=False).index).head(top_features)
+                          "shift_in_pooled_std": ((mt - mp) / scale.where(scale > 1e-12)).to_numpy()})
+    drift = drift.dropna(subset=["shift_in_pooled_std"])
+    drift = drift.reindex(drift.shift_in_pooled_std.abs().sort_values(ascending=False).index).head(top_features)
     sc = score(yt, pred)
     return dict(labels=labels, fp_by_day=fp_by_day, worst_hours=worst_hours, drift=drift.reset_index(drop=True),
                 meta=dict(model=model, origin=k, n_blocks=n_blocks, n_train=len(past), n_test=len(test), **sc))
@@ -188,7 +193,7 @@ def write_explain(res: dict, out: str | Path, name: str) -> Path:
              "## 1. Fraction of each label classified correctly (BENIGN row = 1 - false-alarm rate)", "",
              _md(res["labels"]), "", "## 2. False alarms on benign flows by day", "", _md(res["fp_by_day"]), "",
              "## 3. Worst hours (>=100 benign flows)", "", _md(res["worst_hours"]), "",
-             "## 4. Benign covariate shift, past vs test block (in past-benign standard deviations)", "",
+             "## 4. Benign covariate shift, past vs test block (difference of means / pooled std)", "",
              _md(res["drift"], "{:.3f}"), "",
              "> Descriptive only: one model, one seed, one partition. Time bucketing uses the loader's timestamps "
              "(including the CICIDS2017 AM/PM heuristic).", ""]

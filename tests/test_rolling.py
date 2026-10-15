@@ -62,8 +62,17 @@ def test_explain_origin_breakdowns_are_consistent():
     n_ben = ((b == 3) & (ds.y == 0)).sum()
     assert res["fp_by_day"].n_benign.sum() == n_ben                      # every benign test row bucketed once
     assert (res["fp_by_day"].false_alarms <= res["fp_by_day"].n_benign).all()
-    d = res["drift"].shift_in_past_std.abs().to_numpy()
+    d = res["drift"].shift_in_pooled_std.abs().to_numpy()
     assert len(d) > 0 and (np.diff(d) <= 1e-12).all()                    # sorted by absolute shift
     with tempfile.TemporaryDirectory() as tmp:
         txt = write_explain(res, tmp, "syn").read_text()
         assert "False alarms on benign flows by day" in txt and "covariate shift" in txt
+
+
+def test_drift_ranking_is_not_dominated_by_near_constant_features():
+    from secleak.rolling import explain_origin
+    ds = _multilabel_ds(5000)
+    ds.X["almost_const"] = 0.0
+    ds.X.loc[ds.X.index[-40:], "almost_const"] = 1.0        # flips on in the last 40 rows only
+    res = explain_origin(ds, 5, 3, model="rf", seed=0)
+    assert res["drift"].shift_in_pooled_std.abs().max() < 50  # old past-std scaling gave ~1e8 here

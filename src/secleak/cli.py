@@ -62,6 +62,16 @@ def cmd_diagnose(args):
     print("diagnostics ->", write_diagnostics(res, Path(args.out) / f"diagnose_{ds.name}", ds.name))
 
 
+def cmd_rolling(args):
+    from .rolling import rolling, write_rolling
+    ds = _load(args)
+    df = rolling(ds, n_blocks=args.blocks, first_origin=args.first_origin, models=args.models,
+                 seeds=range(args.seeds), max_train_rows=args.max_train_rows,
+                 max_test_rows=args.max_test_rows or None, cap_mode=args.cap_mode)
+    print("rolling ->", write_rolling(df, Path(args.out) / f"rolling_{ds.name}", ds.name,
+                                       args.blocks, args.first_origin))
+
+
 def cmd_cross(args):
     from .data import harmonise, load_config, load_dataset, subsample  # noqa: F401
     from .experiments import run_cross
@@ -134,6 +144,14 @@ def main(argv=None):
     s.add_argument("--max-test-rows", type=int, default=200_000, help="0 = evaluate on ALL test rows")
     s.add_argument("--cap-mode", choices=["uniform", "label_floor"], default="uniform")
     s.set_defaults(fn=cmd_diagnose)
+
+    s = sub.add_parser("rolling"); data_args(s)
+    s.add_argument("--blocks", type=int, default=10); s.add_argument("--first-origin", type=int, default=4)
+    s.add_argument("--models", nargs="+", default=["rf"]); s.add_argument("--seeds", type=int, default=1)
+    s.add_argument("--max-train-rows", type=int, default=200_000)
+    s.add_argument("--max-test-rows", type=int, default=0, help="0 = evaluate on ALL rows of the test block")
+    s.add_argument("--cap-mode", choices=["uniform", "label_floor"], default="uniform")
+    s.set_defaults(fn=cmd_rolling)
 
     s = sub.add_parser("cross"); s.add_argument("a"); s.add_argument("b")
     s.add_argument("--root", default="."); s.add_argument("--max-rows", type=int, default=200_000)

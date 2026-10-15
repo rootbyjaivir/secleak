@@ -57,3 +57,8 @@ uninformative. `label_floor` keeps every row of labels with <= 5000 rows in the 
 priors toward rare labels; it is applied identically to all protocols) and `--max-test-rows 0` scores all test
 rows. Used ONLY for label-level diagnostics; headline protocol comparisons keep the uniform cap. Any result
 produced with these options must say so.
+
+**2026-10-15 - added `secleak rolling` (post-hoc).**
+Reason: the 70/30 temporal splits are deterministic, so their CIs reflect model seeds only. Rolling-origin
+evaluation (per-label time blocks, matched leaky control; see docs/ROLLING.md) gives uncertainty over test
+windows and measures the benefit of seeing the future at equal training size. Reported as exploratory.

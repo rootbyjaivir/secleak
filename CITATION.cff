@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+title: "SecLeak: integrity audit of network intrusion-detection benchmarks"
+message: "If you use this software, please cite it."
+type: software
+authors:
+  - name: "SecLeak authors"   # EDIT: your name
+version: 0.1.0
+license: MIT
+repository-code: "https://github.com/YOUR_USER/secleak"   # EDIT

@@ -14,6 +14,7 @@ dev = ["pytest"]
 parquet = ["pyarrow"]
 xgb = ["xgboost"]
 llm = ["anthropic"]
+app = ["streamlit>=1.35"]
 
 [project.scripts]
 secleak = "secleak.cli:main"

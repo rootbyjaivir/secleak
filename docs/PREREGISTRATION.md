@@ -62,3 +62,4 @@ produced with these options must say so.
 Reason: the 70/30 temporal splits are deterministic, so their CIs reflect model seeds only. Rolling-origin
 evaluation (per-label time blocks, matched leaky control; see docs/ROLLING.md) gives uncertainty over test
 windows and measures the benefit of seeing the future at equal training size. Reported as exploratory.
+Frozen at commit 9de62573d28450d1f3928a7d00f73079e9981f16 (GitHub, 2026-10-30)

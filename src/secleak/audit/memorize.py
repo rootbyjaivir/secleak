@@ -36,7 +36,6 @@ class AnthropicClient:
 
     def complete(self, prompt: str, max_tokens: int = 400) -> str:
         r = self.client.messages.create(model=self.model, max_tokens=max_tokens,
-                                        temperature=self.temperature,
                                         messages=[{"role": "user", "content": prompt}])
         return "".join(b.text for b in r.content if getattr(b, "type", "") == "text")
 
